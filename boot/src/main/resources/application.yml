@@ -1,0 +1,25 @@
+environment: localhost
+server:
+  port: 9080
+  servlet:
+    context-path: /stsssox
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/SITES_SOX
+    username: postgres
+    password: postgres-pwd
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+forge:
+  security:
+    service-id: sitionixSite
+    dev:
+      jwt-secret: ${FORGE_SECURITY_DEV_JWT_SECRET:dev-internal-auth-secret}
+      issuer: ${FORGE_SECURITY_DEV_ISSUER:sitionix-internal}
+      ttl-seconds: ${FORGE_SECURITY_DEV_TTL_SECONDS:300}
+    policies:
+      sitionixBff:
+        allow:
+          - "*"

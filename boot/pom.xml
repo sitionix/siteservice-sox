@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mongodb</artifactId>
+            <artifactId>postgresql</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- DEPENDENCY -->
@@ -43,6 +43,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sitionix.forge</groupId>
+            <artifactId>forge-security-server</artifactId>
+            <version>${forge.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

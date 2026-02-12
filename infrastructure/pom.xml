@@ -15,5 +15,6 @@
 
     <modules>
         <module>mongodb</module>
+        <module>postgresql</module>
     </modules>
 </project>
