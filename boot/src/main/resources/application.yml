@@ -4,14 +4,12 @@ server:
   servlet:
     context-path: /stsssox
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5433/SITES_SOX
-    username: postgres
-    password: postgres-pwd
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017}
+      database: ${MONGODB_DATABASE:SITES_SOX}
+      uuid-representation: standard
+      auto-index-creation: true
 forge:
   security:
     service-id: sitionixSite

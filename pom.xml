@@ -74,10 +74,6 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mongodb</artifactId>
             </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>postgresql</artifactId>
-            </dependency>
             <!-- DEPENDENCY -->
             <dependency>
                 <groupId>org.mapstruct</groupId>

@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>mongodb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- DEPENDENCY -->
