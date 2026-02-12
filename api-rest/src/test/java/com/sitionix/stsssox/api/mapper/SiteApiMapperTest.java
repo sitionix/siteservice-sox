@@ -46,7 +46,7 @@ class SiteApiMapperTest {
     @Test
     void givenCreateSiteRequestDto_whenAsCreateSiteCommand_thenReturnCreateSiteCommand() {
         //given
-        final CreateSiteRequestDTO given = this.getCreateSiteRequestDTO();
+        final CreateSiteRequestDTO given = this.getCreateSiteRequestDTO(CreateSiteRequestDTO.TemplateEnum.BLANK);
         final CreateSiteCommand expected = this.getCreateSiteCommand();
         when(this.siteTypeApiMapper.mapType(given.getType())).thenReturn(SiteType.BUSINESS);
         when(this.siteTemplateApiMapper.mapTemplate(given.getTemplate())).thenReturn(SiteTemplate.BLANK);
@@ -63,7 +63,7 @@ class SiteApiMapperTest {
     @Test
     void givenCreateSiteRequestDtoWithoutTemplate_whenAsCreateSiteCommand_thenDefaultTemplateToBlank() {
         //given
-        final CreateSiteRequestDTO given = this.getCreateSiteRequestDTOWithoutTemplate();
+        final CreateSiteRequestDTO given = this.getCreateSiteRequestDTO(null);
         final CreateSiteCommand expected = new CreateSiteCommand("Portfolio", SiteType.BUSINESS, "Agency website", SiteTemplate.BLANK);
         when(this.siteTypeApiMapper.mapType(given.getType())).thenReturn(SiteType.BUSINESS);
         when(this.siteTemplateApiMapper.mapTemplate(given.getTemplate())).thenReturn(SiteTemplate.BLANK);
@@ -126,21 +126,15 @@ class SiteApiMapperTest {
         assertThat(actual).isNull();
     }
 
-    private CreateSiteRequestDTO getCreateSiteRequestDTO() {
-        return CreateSiteRequestDTO.builder()
+    private CreateSiteRequestDTO getCreateSiteRequestDTO(final CreateSiteRequestDTO.TemplateEnum template) {
+        final CreateSiteRequestDTO.CreateSiteRequestDTOBuilder builder = CreateSiteRequestDTO.builder()
                 .name("Portfolio")
                 .type(CreateSiteRequestDTO.TypeEnum.BUSINESS)
-                .description("Agency website")
-                .template(CreateSiteRequestDTO.TemplateEnum.BLANK)
-                .build();
-    }
-
-    private CreateSiteRequestDTO getCreateSiteRequestDTOWithoutTemplate() {
-        return CreateSiteRequestDTO.builder()
-                .name("Portfolio")
-                .type(CreateSiteRequestDTO.TypeEnum.BUSINESS)
-                .description("Agency website")
-                .build();
+                .description("Agency website");
+        if (template != null) {
+            builder.template(template);
+        }
+        return builder.build();
     }
 
     private CreateSiteCommand getCreateSiteCommand() {
