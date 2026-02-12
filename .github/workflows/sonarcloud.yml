@@ -66,7 +66,7 @@ jobs:
           mvn -B verify
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
           -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.organization=sitionix
+          -Dsonar.organization=sitionix-vv
           -Dsonar.projectKey=sitionix_siteservice-sox
           -Dsonar.coverage.jacoco.xmlReportPaths=jacoco-report/target/site/jacoco-aggregate/jacoco.xml
           -Dsonar.token=${SONAR_TOKEN}
