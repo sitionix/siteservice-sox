@@ -10,21 +10,37 @@ import com.sitionix.stsssox.domain.model.CreateSiteCommand;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SiteApiMapperTest {
+
+    @Mock
+    private SiteTypeApiMapper siteTypeApiMapper;
+
+    @Mock
+    private SiteTemplateApiMapper siteTemplateApiMapper;
 
     private SiteApiMapper siteApiMapper;
 
     @BeforeEach
     void setUp() {
-        this.siteApiMapper = new SiteApiMapperImpl(new SiteTypeApiMapperImpl(), new SiteTemplateApiMapperImpl());
+        this.siteApiMapper = new SiteApiMapperImpl(this.siteTypeApiMapper, this.siteTemplateApiMapper);
+    }
+
+    @AfterEach
+    void tearDown() {
+        verifyNoMoreInteractions(this.siteTypeApiMapper, this.siteTemplateApiMapper);
     }
 
     @Test
@@ -32,12 +48,16 @@ class SiteApiMapperTest {
         //given
         final CreateSiteRequestDTO given = this.getCreateSiteRequestDTO();
         final CreateSiteCommand expected = this.getCreateSiteCommand();
+        when(this.siteTypeApiMapper.mapType(given.getType())).thenReturn(SiteType.BUSINESS);
+        when(this.siteTemplateApiMapper.mapTemplate(given.getTemplate())).thenReturn(SiteTemplate.BLANK);
 
         //when
         final CreateSiteCommand actual = this.siteApiMapper.asCreateSiteCommand(given);
 
         //then
         assertThat(actual).isEqualTo(expected);
+        verify(this.siteTypeApiMapper).mapType(given.getType());
+        verify(this.siteTemplateApiMapper).mapTemplate(given.getTemplate());
     }
 
     @Test
@@ -45,12 +65,16 @@ class SiteApiMapperTest {
         //given
         final CreateSiteRequestDTO given = this.getCreateSiteRequestDTOWithoutTemplate();
         final CreateSiteCommand expected = new CreateSiteCommand("Portfolio", SiteType.BUSINESS, "Agency website", SiteTemplate.BLANK);
+        when(this.siteTypeApiMapper.mapType(given.getType())).thenReturn(SiteType.BUSINESS);
+        when(this.siteTemplateApiMapper.mapTemplate(given.getTemplate())).thenReturn(SiteTemplate.BLANK);
 
         //when
         final CreateSiteCommand actual = this.siteApiMapper.asCreateSiteCommand(given);
 
         //then
         assertThat(actual).isEqualTo(expected);
+        verify(this.siteTypeApiMapper).mapType(given.getType());
+        verify(this.siteTemplateApiMapper).mapTemplate(given.getTemplate());
     }
 
     @Test
