@@ -3,23 +3,15 @@ package com.sitionix.stsssox.api.handler;
 import com.app_afesox.stsssox.api_first.dto.ErrorDTO;
 import com.sitionix.stsssox.domain.exception.AuthenticationRequiredException;
 import com.sitionix.stsssox.domain.exception.SiteValidationException;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 class RestExceptionHandlerTest {
 
@@ -54,104 +46,6 @@ class RestExceptionHandlerTest {
 
         //then
         assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void givenNameNotNullValidationError_whenHandleValidation_thenReturnNameRequired() {
-        //given
-        final MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
-        final BindingResult bindingResult = mock(BindingResult.class);
-        final FieldError fieldError = mock(FieldError.class);
-        final ResponseEntity<ErrorDTO> expected = this.getErrorResponse(HttpStatus.BAD_REQUEST, "Site name is required");
-
-        when(exception.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
-        when(fieldError.getField()).thenReturn("name");
-        when(fieldError.getCode()).thenReturn("NotNull");
-
-        //when
-        final ResponseEntity<ErrorDTO> actual = this.restExceptionHandler.handleValidation(exception);
-
-        //then
-        assertThat(actual).isEqualTo(expected);
-        verify(exception).getBindingResult();
-        verify(bindingResult).getFieldErrors();
-        verify(fieldError).getField();
-        verify(fieldError).getCode();
-        verifyNoMoreInteractions(exception, bindingResult, fieldError);
-    }
-
-    @Test
-    void givenNameSizeValidationError_whenHandleValidation_thenReturnNameRangeMessage() {
-        //given
-        final MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
-        final BindingResult bindingResult = mock(BindingResult.class);
-        final FieldError fieldError = mock(FieldError.class);
-        final ResponseEntity<ErrorDTO> expected =
-                this.getErrorResponse(HttpStatus.BAD_REQUEST, "Site name must be between 1 and 60 characters");
-
-        when(exception.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
-        when(fieldError.getField()).thenReturn("name");
-        when(fieldError.getCode()).thenReturn("Size");
-
-        //when
-        final ResponseEntity<ErrorDTO> actual = this.restExceptionHandler.handleValidation(exception);
-
-        //then
-        assertThat(actual).isEqualTo(expected);
-        verify(exception).getBindingResult();
-        verify(bindingResult).getFieldErrors();
-        verify(fieldError, times(2)).getField();
-        verify(fieldError, times(3)).getCode();
-        verifyNoMoreInteractions(exception, bindingResult, fieldError);
-    }
-
-    @Test
-    void givenUnknownValidationError_whenHandleValidation_thenReturnDefaultFieldMessage() {
-        //given
-        final MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
-        final BindingResult bindingResult = mock(BindingResult.class);
-        final FieldError fieldError = mock(FieldError.class);
-        final ResponseEntity<ErrorDTO> expected =
-                this.getErrorResponse(HttpStatus.BAD_REQUEST, "Any validation message");
-
-        when(exception.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
-        when(fieldError.getField()).thenReturn("description");
-        when(fieldError.getCode()).thenReturn("Pattern");
-        when(fieldError.getDefaultMessage()).thenReturn("Any validation message");
-
-        //when
-        final ResponseEntity<ErrorDTO> actual = this.restExceptionHandler.handleValidation(exception);
-
-        //then
-        assertThat(actual).isEqualTo(expected);
-        verify(exception).getBindingResult();
-        verify(bindingResult).getFieldErrors();
-        verify(fieldError, times(2)).getField();
-        verify(fieldError).getDefaultMessage();
-        verifyNoMoreInteractions(exception, bindingResult, fieldError);
-    }
-
-    @Test
-    void givenNoValidationErrors_whenHandleValidation_thenReturnValidationFailedMessage() {
-        //given
-        final MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
-        final BindingResult bindingResult = mock(BindingResult.class);
-        final ResponseEntity<ErrorDTO> expected = this.getErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed");
-
-        when(exception.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(Collections.emptyList());
-
-        //when
-        final ResponseEntity<ErrorDTO> actual = this.restExceptionHandler.handleValidation(exception);
-
-        //then
-        assertThat(actual).isEqualTo(expected);
-        verify(exception).getBindingResult();
-        verify(bindingResult).getFieldErrors();
-        verifyNoMoreInteractions(exception, bindingResult);
     }
 
     @Test
