@@ -17,7 +17,6 @@ public class ControllerEndpoint {
                 (MockmvcDefault) context -> context
                         .header("X-Forge-User-Sub", "1")
                         .withRequest("createSiteRequest.json")
-                        .expectResponse("createSiteResponse.json")
                         .expectStatus(201)
         );
     }

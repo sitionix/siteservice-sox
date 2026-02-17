@@ -1,10 +1,6 @@
 package com.sitionix.stsssox.it;
 
-import com.app_afesox.stsssox.api_first.dto.CreateSiteRequestDTO;
-import com.app_afesox.stsssox.api_first.dto.CreateSiteResponseDTO;
 import com.sitionix.forgeit.core.test.IntegrationTest;
-import com.sitionix.forgeit.domain.endpoint.Endpoint;
-import com.sitionix.forgeit.domain.endpoint.HttpMethod;
 import com.sitionix.stsssox.domain.SiteStatus;
 import com.sitionix.stsssox.domain.SiteType;
 import com.sitionix.stsssox.it.infra.ControllerEndpoint;
@@ -30,19 +26,16 @@ class SiteControllerIT {
     @DisplayName("Should create site and persist it in MongoDB")
     void givenValidRequest_whenCreateSite_thenReturnCreatedAndPersistSite() {
         //given
-        final Long userId = 101L;
+        final Long userId = 1L;
 
         //when
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .withRequest("createSiteRequest.json")
-                .header("X-Forge-User-Sub", userId.toString())
                 .expectResponse("createSiteResponse.json", "siteId", "createdAt", "updatedAt")
-                .expectStatus(HttpStatus.CREATED)
                 .andExpectPath(MockMvcResultMatchers.jsonPath("$.siteId").isNotEmpty())
                 .andExpectPath(MockMvcResultMatchers.jsonPath("$.createdAt").isNotEmpty())
                 .andExpectPath(MockMvcResultMatchers.jsonPath("$.updatedAt").isNotEmpty())
-                .assertAndCreate();
+                .assertDefault();
 
         //then
         this.testManager.mongo()
@@ -64,21 +57,18 @@ class SiteControllerIT {
     @DisplayName("Should create site when only required name is provided")
     void givenRequestWithOnlyName_whenCreateSite_thenReturnCreatedAndPersistSite() {
         //given
-        final Long userId = 102L;
+        final Long userId = 1L;
 
         //when
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .withRequest("createSiteRequest.json", request -> {
+                .andExpectPath(MockMvcResultMatchers.jsonPath("$.name").value("Portfolio"))
+                .andExpectPath(MockMvcResultMatchers.jsonPath("$.status").value("DRAFT"))
+                .assertDefault(defaults -> defaults.mutateRequest(request -> {
                     request.setType(null);
                     request.setDescription(null);
                     request.setTemplate(null);
-                })
-                .header("X-Forge-User-Sub", userId.toString())
-                .expectStatus(HttpStatus.CREATED)
-                .andExpectPath(MockMvcResultMatchers.jsonPath("$.name").value("Portfolio"))
-                .andExpectPath(MockMvcResultMatchers.jsonPath("$.status").value("DRAFT"))
-                .assertAndCreate();
+                }));
 
         //then
         this.testManager.mongo()
@@ -97,16 +87,14 @@ class SiteControllerIT {
     @DisplayName("Should trim site name before persisting")
     void givenRequestWithPaddedName_whenCreateSite_thenPersistTrimmedName() {
         //given
-        final Long userId = 103L;
+        final Long userId = 1L;
 
         //when
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .withRequest("createSiteRequest.json", request -> request.setName("   My site name   "))
-                .header("X-Forge-User-Sub", userId.toString())
-                .expectStatus(HttpStatus.CREATED)
                 .andExpectPath(MockMvcResultMatchers.jsonPath("$.name").value("My site name"))
-                .assertAndCreate();
+                .assertDefault(defaults -> defaults
+                        .mutateRequest(request -> request.setName("   My site name   ")));
 
         //then
         this.testManager.mongo()
@@ -123,22 +111,16 @@ class SiteControllerIT {
     @DisplayName("Should allow duplicate site names")
     void givenDuplicateNameRequests_whenCreateSiteTwice_thenPersistBothSites() {
         //given
-        final Long userId = 104L;
+        final Long userId = 1L;
 
         //when
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .withRequest("createSiteRequest.json")
-                .header("X-Forge-User-Sub", userId.toString())
-                .expectStatus(HttpStatus.CREATED)
-                .assertAndCreate();
+                .assertDefault();
 
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .withRequest("createSiteRequest.json")
-                .header("X-Forge-User-Sub", userId.toString())
-                .expectStatus(HttpStatus.CREATED)
-                .assertAndCreate();
+                .assertDefault();
 
         //then
         this.testManager.mongo()
@@ -158,20 +140,12 @@ class SiteControllerIT {
     @Test
     @DisplayName("Should return unauthorized and persist nothing when user context is missing")
     void givenMissingUserContext_whenCreateSite_thenReturnUnauthorizedAndPersistNothing() {
-        //given
-        final Endpoint<CreateSiteRequestDTO, CreateSiteResponseDTO> endpointWithoutUserHeaderDefault = Endpoint.createContract(
-                "/api/v1/sites",
-                HttpMethod.POST,
-                CreateSiteRequestDTO.class,
-                CreateSiteResponseDTO.class
-        );
-
         //when
         this.testManager.mockMvc()
-                .ping(endpointWithoutUserHeaderDefault)
-                .withRequest("createSiteRequest.json")
+                .ping(ControllerEndpoint.createSite())
+                .applyDefault(context -> context.header("X-Forge-User-Sub", null))
                 .expectStatus(HttpStatus.UNAUTHORIZED)
-                .assertAndCreate();
+                .assertDefault();
 
         //then
         this.testManager.mongo()
@@ -182,16 +156,12 @@ class SiteControllerIT {
     @Test
     @DisplayName("Should return bad request and persist nothing for blank name")
     void givenBlankName_whenCreateSite_thenReturnBadRequestAndPersistNothing() {
-        //given
-        final Long userId = 105L;
-
         //when
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .withRequest("createSiteRequest.json", request -> request.setName("   "))
-                .header("X-Forge-User-Sub", userId.toString())
                 .expectStatus(HttpStatus.BAD_REQUEST)
-                .assertAndCreate();
+                .assertDefault(defaults -> defaults
+                        .mutateRequest(request -> request.setName("   ")));
 
         //then
         this.testManager.mongo()
@@ -202,17 +172,12 @@ class SiteControllerIT {
     @Test
     @DisplayName("Should return bad request and persist nothing for name longer than sixty characters")
     void givenNameLongerThanSixty_whenCreateSite_thenReturnBadRequestAndPersistNothing() {
-        //given
-        final Long userId = 106L;
-
         //when
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .withRequest("createSiteRequest.json",
-                        request -> request.setName("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
-                .header("X-Forge-User-Sub", userId.toString())
                 .expectStatus(HttpStatus.BAD_REQUEST)
-                .assertAndCreate();
+                .assertDefault(defaults -> defaults
+                        .mutateRequest(request -> request.setName("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")));
 
         //then
         this.testManager.mongo()
