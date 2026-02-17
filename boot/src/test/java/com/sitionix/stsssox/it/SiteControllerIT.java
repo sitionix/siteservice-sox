@@ -143,7 +143,7 @@ class SiteControllerIT {
         //when
         this.testManager.mockMvc()
                 .ping(ControllerEndpoint.createSite())
-                .applyDefault(context -> context.header("X-Forge-User-Sub", null))
+                .header("X-Forge-User-Sub", null)
                 .expectStatus(HttpStatus.UNAUTHORIZED)
                 .assertDefault();
 
