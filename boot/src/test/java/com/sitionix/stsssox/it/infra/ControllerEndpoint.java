@@ -20,4 +20,15 @@ public class ControllerEndpoint {
                         .expectStatus(201)
         );
     }
+
+    public static Endpoint<CreateSiteRequestDTO, CreateSiteResponseDTO> createSiteWithDefaultUserHeader(final Long userId) {
+        return Endpoint.createContract(
+                "/api/v1/sites",
+                HttpMethod.POST,
+                CreateSiteRequestDTO.class,
+                CreateSiteResponseDTO.class,
+                (MockmvcDefault) context -> context
+                        .header("X-Forge-User-Sub", userId.toString())
+        );
+    }
 }
