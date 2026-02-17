@@ -113,6 +113,12 @@
                         <include>**/*IT.java</include>
                     </includes>
                     <skip>${skipITs}</skip>
+                    <environmentVariables>
+                        <DOCKER_API_VERSION>${docker.api.version}</DOCKER_API_VERSION>
+                    </environmentVariables>
+                    <systemPropertyVariables>
+                        <docker.api.version>${docker.api.version}</docker.api.version>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
