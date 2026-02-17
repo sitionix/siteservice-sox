@@ -22,11 +22,11 @@ class SiteControllerDefaultHeaderIT {
     @DisplayName("Should apply default user header from endpoint defaults")
     void givenEndpointDefaultUserHeader_whenCreateSite_thenReturnCreatedAndPersistSite() {
         //given
-        final Long userId = 107L;
+        final Long userId = 1L;
 
         //when
         this.testManager.mockMvc()
-                .ping(ControllerEndpoint.createSiteWithDefaultUserHeader(userId))
+                .ping(ControllerEndpoint.createSiteWithDefaultUserHeader())
                 .withRequest("createSiteRequest.json")
                 .expectStatus(HttpStatus.CREATED)
                 .andExpectPath(MockMvcResultMatchers.jsonPath("$.siteId").isNotEmpty())
