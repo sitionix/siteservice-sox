@@ -26,7 +26,7 @@ class SiteControllerDefaultHeaderIT {
 
         //when
         this.testManager.mockMvc()
-                .ping(ControllerEndpoint.createSiteWithDefaultUserHeader())
+                .ping(ControllerEndpoint.createSite())
                 .withRequest("createSiteRequest.json")
                 .expectStatus(HttpStatus.CREATED)
                 .andExpectPath(MockMvcResultMatchers.jsonPath("$.siteId").isNotEmpty())

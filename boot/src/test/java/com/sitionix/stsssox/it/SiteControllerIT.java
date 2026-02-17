@@ -1,6 +1,10 @@
 package com.sitionix.stsssox.it;
 
+import com.app_afesox.stsssox.api_first.dto.CreateSiteRequestDTO;
+import com.app_afesox.stsssox.api_first.dto.CreateSiteResponseDTO;
 import com.sitionix.forgeit.core.test.IntegrationTest;
+import com.sitionix.forgeit.domain.endpoint.Endpoint;
+import com.sitionix.forgeit.domain.endpoint.HttpMethod;
 import com.sitionix.stsssox.domain.SiteStatus;
 import com.sitionix.stsssox.domain.SiteType;
 import com.sitionix.stsssox.it.infra.ControllerEndpoint;
@@ -154,9 +158,17 @@ class SiteControllerIT {
     @Test
     @DisplayName("Should return unauthorized and persist nothing when user context is missing")
     void givenMissingUserContext_whenCreateSite_thenReturnUnauthorizedAndPersistNothing() {
+        //given
+        final Endpoint<CreateSiteRequestDTO, CreateSiteResponseDTO> endpointWithoutUserHeaderDefault = Endpoint.createContract(
+                "/api/v1/sites",
+                HttpMethod.POST,
+                CreateSiteRequestDTO.class,
+                CreateSiteResponseDTO.class
+        );
+
         //when
         this.testManager.mockMvc()
-                .ping(ControllerEndpoint.createSite())
+                .ping(endpointWithoutUserHeaderDefault)
                 .withRequest("createSiteRequest.json")
                 .expectStatus(HttpStatus.UNAUTHORIZED)
                 .assertAndCreate();
