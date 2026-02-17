@@ -114,10 +114,10 @@
                     </includes>
                     <skip>${skipITs}</skip>
                     <environmentVariables>
-                        <DOCKER_API_VERSION>${docker.api.version}</DOCKER_API_VERSION>
+                        <API_VERSION>${api.version}</API_VERSION>
                     </environmentVariables>
                     <systemPropertyVariables>
-                        <docker.api.version>${docker.api.version}</docker.api.version>
+                        <api.version>${api.version}</api.version>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

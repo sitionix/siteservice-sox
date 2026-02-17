@@ -48,7 +48,7 @@
         <validation.version>2.0.1.Final</validation.version>
         <spring.version>3.3.4</spring.version>
         <testcontainers.version>1.20.1</testcontainers.version>
-        <docker.api.version>1.44</docker.api.version>
+        <api.version>1.44</api.version>
         <forgeit.version>0.0.37</forgeit.version>
         <forge.security.version>0.0.4</forge.security.version>
     </properties>
@@ -103,10 +103,10 @@
                             <include>**/*Test.java</include>
                         </includes>
                         <environmentVariables>
-                            <DOCKER_API_VERSION>${docker.api.version}</DOCKER_API_VERSION>
+                            <API_VERSION>${api.version}</API_VERSION>
                         </environmentVariables>
                         <systemPropertyVariables>
-                            <docker.api.version>${docker.api.version}</docker.api.version>
+                            <api.version>${api.version}</api.version>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
