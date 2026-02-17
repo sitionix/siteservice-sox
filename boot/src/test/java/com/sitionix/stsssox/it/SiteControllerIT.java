@@ -154,6 +154,22 @@ class SiteControllerIT {
     }
 
     @Test
+    @DisplayName("Should return forbidden and persist nothing when S2S token is missing")
+    void givenMissingS2sToken_whenCreateSite_thenReturnForbiddenAndPersistNothing() {
+        //when
+        this.testManager.mockMvc()
+                .ping(ControllerEndpoint.createSite())
+                .token(null)
+                .expectStatus(HttpStatus.FORBIDDEN)
+                .assertDefault();
+
+        //then
+        this.testManager.mongo()
+                .get(SiteEntity.class)
+                .hasSize(0);
+    }
+
+    @Test
     @DisplayName("Should return bad request and persist nothing for blank name")
     void givenBlankName_whenCreateSite_thenReturnBadRequestAndPersistNothing() {
         //when
