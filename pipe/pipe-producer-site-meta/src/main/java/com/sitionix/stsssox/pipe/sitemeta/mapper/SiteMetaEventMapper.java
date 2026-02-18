@@ -8,14 +8,32 @@ import com.app_afesox.stsssox.events.sitemeta.SiteStatusDTO;
 import com.app_afesox.stsssox.events.sitemeta.SiteTypeDTO;
 import com.app_afesox.stsssox.events.sitemeta.SiteUpdatedEvent;
 import com.sitionix.stsssox.domain.Site;
+import com.sitionix.stsssox.domain.event.Event;
+import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
+import com.sitionix.stsssox.domain.event.payload.SiteDeletedPayload;
+import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
+import com.sitionix.stsssox.domain.event.payload.SiteUpdatedPayload;
 import java.time.Instant;
-import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SiteMetaEventMapper {
 
-    public SiteMetaEnvelope asCreatedEnvelope(final Site site) {
+    public SiteMetaEnvelope asEnvelope(final Event<SiteMetaPayload> event) {
+        final Object payload = event.getPayload();
+        if (payload instanceof SiteCreatedPayload createdPayload) {
+            return this.asCreatedEnvelope(event, createdPayload.site());
+        }
+        if (payload instanceof SiteUpdatedPayload updatedPayload) {
+            return this.asUpdatedEnvelope(event, updatedPayload.site());
+        }
+        if (payload instanceof SiteDeletedPayload deletedPayload) {
+            return this.asDeletedEnvelope(event, deletedPayload);
+        }
+        throw new IllegalArgumentException("Unsupported site meta payload type: " + payload.getClass().getName());
+    }
+
+    private SiteMetaEnvelope asCreatedEnvelope(final Event<SiteMetaPayload> event, final Site site) {
         final SiteCreatedEvent payload = SiteCreatedEvent.newBuilder()
                 .setSiteId(site.siteId().toString())
                 .setOwnerUserId(site.userId())
@@ -27,12 +45,12 @@ public class SiteMetaEventMapper {
                 .setUpdatedAt(this.asIsoInstant(site.updatedAt()))
                 .build();
         return SiteMetaEnvelope.newBuilder()
-                .setMetadata(this.asMetadata("SITE_CREATED"))
+                .setMetadata(this.asMetadata(event))
                 .setPayload(payload)
                 .build();
     }
 
-    public SiteMetaEnvelope asUpdatedEnvelope(final Site site) {
+    private SiteMetaEnvelope asUpdatedEnvelope(final Event<SiteMetaPayload> event, final Site site) {
         final SiteUpdatedEvent payload = SiteUpdatedEvent.newBuilder()
                 .setSiteId(site.siteId().toString())
                 .setOwnerUserId(site.userId())
@@ -43,19 +61,19 @@ public class SiteMetaEventMapper {
                 .setUpdatedAt(this.asIsoInstant(site.updatedAt()))
                 .build();
         return SiteMetaEnvelope.newBuilder()
-                .setMetadata(this.asMetadata("SITE_UPDATED"))
+                .setMetadata(this.asMetadata(event))
                 .setPayload(payload)
                 .build();
     }
 
-    public SiteMetaEnvelope asDeletedEnvelope(final UUID siteId, final Long ownerUserId, final Instant deletedAt) {
+    private SiteMetaEnvelope asDeletedEnvelope(final Event<SiteMetaPayload> event, final SiteDeletedPayload deletedPayload) {
         final SiteDeletedEvent payload = SiteDeletedEvent.newBuilder()
-                .setSiteId(siteId.toString())
-                .setOwnerUserId(ownerUserId)
-                .setDeletedAt(this.asIsoInstant(deletedAt))
+                .setSiteId(deletedPayload.siteId().toString())
+                .setOwnerUserId(deletedPayload.ownerUserId())
+                .setDeletedAt(this.asIsoInstant(deletedPayload.deletedAt()))
                 .build();
         return SiteMetaEnvelope.newBuilder()
-                .setMetadata(this.asMetadata("SITE_DELETED"))
+                .setMetadata(this.asMetadata(event))
                 .setPayload(payload)
                 .build();
     }
@@ -81,11 +99,11 @@ public class SiteMetaEventMapper {
         return instant.toString();
     }
 
-    private Metadata asMetadata(final String eventType) {
+    private Metadata asMetadata(final Event<SiteMetaPayload> event) {
         return Metadata.newBuilder()
-                .setIdempotencyId(UUID.randomUUID().toString())
-                .setCreatedAt(Instant.now().toEpochMilli())
-                .setEventType(eventType)
+                .setIdempotencyId(event.getIdempotencyId().toString())
+                .setCreatedAt(event.getCreatedAt().toEpochMilli())
+                .setEventType(event.getEventType())
                 .build();
     }
 }

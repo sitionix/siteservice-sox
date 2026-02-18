@@ -2,6 +2,7 @@ package com.sitionix.stsssox.application.usecase;
 
 import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.SiteStatus;
+import com.sitionix.stsssox.domain.event.Event;
 import com.sitionix.stsssox.domain.event.SiteMetaEventPublisher;
 import com.sitionix.stsssox.domain.exception.AuthenticationRequiredException;
 import com.sitionix.stsssox.domain.exception.SiteValidationException;
@@ -31,7 +32,7 @@ public class CreateSiteImpl implements CreateSite {
 
         final Site site = this.buildSite(command, userId, normalizedName, now);
         final Site savedSite = this.siteRepository.save(site);
-        this.siteMetaEventPublisher.publishSiteCreated(savedSite);
+        this.siteMetaEventPublisher.publish(Event.siteCreated(savedSite));
         return savedSite;
     }
 

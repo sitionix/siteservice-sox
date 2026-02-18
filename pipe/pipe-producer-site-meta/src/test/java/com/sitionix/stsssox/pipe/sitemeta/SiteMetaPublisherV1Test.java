@@ -2,10 +2,9 @@ package com.sitionix.stsssox.pipe.sitemeta;
 
 import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
 import com.app_afesox.stsssox.events.sitemeta.kafka.SitemetaV1Producer;
-import com.sitionix.stsssox.domain.Site;
+import com.sitionix.stsssox.domain.event.Event;
+import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
 import com.sitionix.stsssox.pipe.sitemeta.mapper.SiteMetaEventMapper;
-import java.time.Instant;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,49 +40,32 @@ class SiteMetaPublisherV1Test {
     }
 
     @Test
-    void givenSite_whenPublishSiteCreated_thenSendCreatedEnvelope() {
+    void givenEvent_whenPublish_thenSendEnvelope() {
         //given
-        final Site site = mock(Site.class);
-        final UUID siteId = UUID.randomUUID();
+        final Event<SiteMetaPayload> event = mock(Event.class);
+        final String eventId = "8fd6adf3-58a9-4d55-9c70-1ce080cae8f9";
         final SiteMetaEnvelope siteMetaEnvelope = mock(SiteMetaEnvelope.class);
-        when(site.siteId()).thenReturn(siteId);
-        when(this.mapper.asCreatedEnvelope(site)).thenReturn(siteMetaEnvelope);
+        when(event.getId()).thenReturn(eventId);
+        when(this.mapper.asEnvelope(event)).thenReturn(siteMetaEnvelope);
 
         //when
-        this.siteMetaPublisherV1.publishSiteCreated(site);
+        this.siteMetaPublisherV1.publish(event);
 
         //then
-        verify(this.mapper).asCreatedEnvelope(site);
-        verify(this.producer).send(siteId.toString(), siteMetaEnvelope);
-        verifyNoMoreInteractions(site, siteMetaEnvelope);
+        verify(event).getId();
+        verify(this.mapper).asEnvelope(event);
+        verify(this.producer).send(eventId, siteMetaEnvelope);
+        verifyNoMoreInteractions(event, siteMetaEnvelope);
     }
 
     @Test
-    void givenNullSite_whenPublishSiteCreated_thenSkipPublishing() {
+    void givenNullEvent_whenPublish_thenSkipPublishing() {
         //given
 
         //when
-        this.siteMetaPublisherV1.publishSiteCreated(null);
+        this.siteMetaPublisherV1.publish(null);
 
         //then
         verifyNoInteractions(this.producer, this.mapper);
-    }
-
-    @Test
-    void givenDeletedData_whenPublishSiteDeleted_thenSendDeletedEnvelope() {
-        //given
-        final UUID siteId = UUID.randomUUID();
-        final Long ownerUserId = 101L;
-        final Instant deletedAt = Instant.parse("2026-02-18T11:10:00Z");
-        final SiteMetaEnvelope siteMetaEnvelope = mock(SiteMetaEnvelope.class);
-        when(this.mapper.asDeletedEnvelope(siteId, ownerUserId, deletedAt)).thenReturn(siteMetaEnvelope);
-
-        //when
-        this.siteMetaPublisherV1.publishSiteDeleted(siteId, ownerUserId, deletedAt);
-
-        //then
-        verify(this.mapper).asDeletedEnvelope(siteId, ownerUserId, deletedAt);
-        verify(this.producer).send(siteId.toString(), siteMetaEnvelope);
-        verifyNoMoreInteractions(siteMetaEnvelope);
     }
 }
