@@ -5,6 +5,7 @@ import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.SiteStatus;
 import com.sitionix.stsssox.domain.SiteTemplate;
 import com.sitionix.stsssox.domain.SiteType;
+import com.sitionix.stsssox.domain.event.SiteMetaEventPublisher;
 import com.sitionix.stsssox.domain.exception.AuthenticationRequiredException;
 import com.sitionix.stsssox.domain.exception.SiteValidationException;
 import com.sitionix.stsssox.domain.model.CreateSiteCommand;
@@ -38,14 +39,17 @@ class CreateSiteImplTest {
     @Mock
     private ForgeUserClient forgeUserClient;
 
+    @Mock
+    private SiteMetaEventPublisher siteMetaEventPublisher;
+
     @BeforeEach
     void setUp() {
-        this.createSite = new CreateSiteImpl(this.siteRepository, this.forgeUserClient);
+        this.createSite = new CreateSiteImpl(this.siteRepository, this.forgeUserClient, this.siteMetaEventPublisher);
     }
 
     @AfterEach
     void tearDown() {
-        verifyNoMoreInteractions(this.siteRepository, this.forgeUserClient);
+        verifyNoMoreInteractions(this.siteRepository, this.forgeUserClient, this.siteMetaEventPublisher);
     }
 
     @Test
@@ -66,6 +70,7 @@ class CreateSiteImplTest {
         verify(this.forgeUserClient).getUserId();
         verify(this.siteRepository).save(siteCaptor.capture());
         final Site savedSite = siteCaptor.getValue();
+        verify(this.siteMetaEventPublisher).publishSiteCreated(savedSite);
         assertThat(actual).isEqualTo(savedSite);
         assertThat(savedSite.userId()).isEqualTo(userId);
         assertThat(savedSite.name()).isEqualTo("My site");
@@ -90,7 +95,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(AuthenticationRequiredException.class)
                 .hasMessage("Authentication required");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository);
+        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
     }
 
     @Test
@@ -107,7 +112,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(SiteValidationException.class)
                 .hasMessage("Site name is required");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository);
+        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
     }
 
     @Test
@@ -124,7 +129,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(SiteValidationException.class)
                 .hasMessage("Site name is required");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository);
+        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
     }
 
     @Test
@@ -141,7 +146,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(SiteValidationException.class)
                 .hasMessage("Site name must be between 1 and 60 characters");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository);
+        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
     }
 
     private CreateSiteCommand getCreateSiteCommand(final String name) {

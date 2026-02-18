@@ -2,6 +2,7 @@ package com.sitionix.stsssox.application.usecase;
 
 import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.SiteStatus;
+import com.sitionix.stsssox.domain.event.SiteMetaEventPublisher;
 import com.sitionix.stsssox.domain.exception.AuthenticationRequiredException;
 import com.sitionix.stsssox.domain.exception.SiteValidationException;
 import com.sitionix.stsssox.domain.model.CreateSiteCommand;
@@ -20,6 +21,7 @@ public class CreateSiteImpl implements CreateSite {
 
     private final SiteRepository siteRepository;
     private final ForgeUserClient forgeUserClient;
+    private final SiteMetaEventPublisher siteMetaEventPublisher;
 
     @Override
     public Site execute(final CreateSiteCommand command) {
@@ -28,8 +30,9 @@ public class CreateSiteImpl implements CreateSite {
         final Instant now = Instant.now();
 
         final Site site = this.buildSite(command, userId, normalizedName, now);
-
-        return this.siteRepository.save(site);
+        final Site savedSite = this.siteRepository.save(site);
+        this.siteMetaEventPublisher.publishSiteCreated(savedSite);
+        return savedSite;
     }
 
     private Site buildSite(final CreateSiteCommand command,
