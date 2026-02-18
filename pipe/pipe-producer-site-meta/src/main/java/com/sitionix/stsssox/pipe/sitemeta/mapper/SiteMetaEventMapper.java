@@ -4,28 +4,29 @@ import com.app_afesox.events.Metadata;
 import com.app_afesox.stsssox.events.sitemeta.SiteCreatedEvent;
 import com.app_afesox.stsssox.events.sitemeta.SiteDeletedEvent;
 import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
-import com.app_afesox.stsssox.events.sitemeta.SiteStatusDTO;
-import com.app_afesox.stsssox.events.sitemeta.SiteTypeDTO;
 import com.app_afesox.stsssox.events.sitemeta.SiteUpdatedEvent;
-import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.event.Event;
 import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
 import com.sitionix.stsssox.domain.event.payload.SiteDeletedPayload;
 import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
 import com.sitionix.stsssox.domain.event.payload.SiteUpdatedPayload;
 import java.time.Instant;
-import org.springframework.stereotype.Component;
+import java.util.UUID;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-@Component
-public class SiteMetaEventMapper {
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+public interface SiteMetaEventMapper {
 
-    public SiteMetaEnvelope asEnvelope(final Event<SiteMetaPayload> event) {
+    default SiteMetaEnvelope asEnvelope(final Event<SiteMetaPayload> event) {
         final Object payload = event.getPayload();
         if (payload instanceof SiteCreatedPayload createdPayload) {
-            return this.asCreatedEnvelope(event, createdPayload.site());
+            return this.asCreatedEnvelope(event, createdPayload);
         }
         if (payload instanceof SiteUpdatedPayload updatedPayload) {
-            return this.asUpdatedEnvelope(event, updatedPayload.site());
+            return this.asUpdatedEnvelope(event, updatedPayload);
         }
         if (payload instanceof SiteDeletedPayload deletedPayload) {
             return this.asDeletedEnvelope(event, deletedPayload);
@@ -33,77 +34,67 @@ public class SiteMetaEventMapper {
         throw new IllegalArgumentException("Unsupported site meta payload type: " + payload.getClass().getName());
     }
 
-    private SiteMetaEnvelope asCreatedEnvelope(final Event<SiteMetaPayload> event, final Site site) {
-        final SiteCreatedEvent payload = SiteCreatedEvent.newBuilder()
-                .setSiteId(site.siteId().toString())
-                .setOwnerUserId(site.userId())
-                .setName(site.name())
-                .setStatus(this.asSiteStatus(site))
-                .setType(this.asSiteType(site))
-                .setDescription(site.description())
-                .setCreatedAt(this.asIsoInstant(site.createdAt()))
-                .setUpdatedAt(this.asIsoInstant(site.updatedAt()))
-                .build();
-        return SiteMetaEnvelope.newBuilder()
-                .setMetadata(this.asMetadata(event))
-                .setPayload(payload)
-                .build();
-    }
+    @Mapping(target = "metadata", source = "event")
+    @Mapping(target = "payload", expression = "java(this.asPayload(payload))")
+    SiteMetaEnvelope asCreatedEnvelope(Event<SiteMetaPayload> event, SiteCreatedPayload payload);
 
-    private SiteMetaEnvelope asUpdatedEnvelope(final Event<SiteMetaPayload> event, final Site site) {
-        final SiteUpdatedEvent payload = SiteUpdatedEvent.newBuilder()
-                .setSiteId(site.siteId().toString())
-                .setOwnerUserId(site.userId())
-                .setName(site.name())
-                .setStatus(this.asSiteStatus(site))
-                .setType(this.asSiteType(site))
-                .setDescription(site.description())
-                .setUpdatedAt(this.asIsoInstant(site.updatedAt()))
-                .build();
-        return SiteMetaEnvelope.newBuilder()
-                .setMetadata(this.asMetadata(event))
-                .setPayload(payload)
-                .build();
-    }
+    @Mapping(target = "metadata", source = "event")
+    @Mapping(target = "payload", expression = "java(this.asPayload(payload))")
+    SiteMetaEnvelope asUpdatedEnvelope(Event<SiteMetaPayload> event, SiteUpdatedPayload payload);
 
-    private SiteMetaEnvelope asDeletedEnvelope(final Event<SiteMetaPayload> event, final SiteDeletedPayload deletedPayload) {
-        final SiteDeletedEvent payload = SiteDeletedEvent.newBuilder()
-                .setSiteId(deletedPayload.siteId().toString())
-                .setOwnerUserId(deletedPayload.ownerUserId())
-                .setDeletedAt(this.asIsoInstant(deletedPayload.deletedAt()))
-                .build();
-        return SiteMetaEnvelope.newBuilder()
-                .setMetadata(this.asMetadata(event))
-                .setPayload(payload)
-                .build();
-    }
+    @Mapping(target = "metadata", source = "event")
+    @Mapping(target = "payload", expression = "java(this.asPayload(payload))")
+    SiteMetaEnvelope asDeletedEnvelope(Event<SiteMetaPayload> event, SiteDeletedPayload payload);
 
-    private SiteStatusDTO asSiteStatus(final Site site) {
-        if (site.status() == null) {
+    @Mapping(target = "siteId", source = "site.siteId", qualifiedByName = "uuidToString")
+    @Mapping(target = "ownerUserId", source = "site.userId")
+    @Mapping(target = "name", source = "site.name")
+    @Mapping(target = "status", source = "site.status")
+    @Mapping(target = "type", source = "site.type")
+    @Mapping(target = "description", source = "site.description")
+    @Mapping(target = "createdAt", source = "site.createdAt", qualifiedByName = "instantToString")
+    @Mapping(target = "updatedAt", source = "site.updatedAt", qualifiedByName = "instantToString")
+    SiteCreatedEvent asPayload(SiteCreatedPayload payload);
+
+    @Mapping(target = "siteId", source = "site.siteId", qualifiedByName = "uuidToString")
+    @Mapping(target = "ownerUserId", source = "site.userId")
+    @Mapping(target = "name", source = "site.name")
+    @Mapping(target = "status", source = "site.status")
+    @Mapping(target = "type", source = "site.type")
+    @Mapping(target = "description", source = "site.description")
+    @Mapping(target = "updatedAt", source = "site.updatedAt", qualifiedByName = "instantToString")
+    SiteUpdatedEvent asPayload(SiteUpdatedPayload payload);
+
+    @Mapping(target = "siteId", source = "siteId", qualifiedByName = "uuidToString")
+    @Mapping(target = "deletedAt", source = "deletedAt", qualifiedByName = "instantToString")
+    SiteDeletedEvent asPayload(SiteDeletedPayload payload);
+
+    @Mapping(target = "idempotencyId", source = "idempotencyId", qualifiedByName = "uuidToString")
+    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "instantToEpochMillis")
+    @Mapping(target = "eventType", source = "eventType")
+    Metadata asMetadata(Event<SiteMetaPayload> event);
+
+    @Named("instantToString")
+    default String instantToString(final Instant value) {
+        if (value == null) {
             return null;
         }
-        return SiteStatusDTO.valueOf(site.status().name());
+        return value.toString();
     }
 
-    private SiteTypeDTO asSiteType(final Site site) {
-        if (site.type() == null) {
+    @Named("instantToEpochMillis")
+    default Long instantToEpochMillis(final Instant value) {
+        if (value == null) {
             return null;
         }
-        return SiteTypeDTO.valueOf(site.type().name());
+        return value.toEpochMilli();
     }
 
-    private String asIsoInstant(final Instant instant) {
-        if (instant == null) {
+    @Named("uuidToString")
+    default String uuidToString(final UUID value) {
+        if (value == null) {
             return null;
         }
-        return instant.toString();
-    }
-
-    private Metadata asMetadata(final Event<SiteMetaPayload> event) {
-        return Metadata.newBuilder()
-                .setIdempotencyId(event.getIdempotencyId().toString())
-                .setCreatedAt(event.getCreatedAt().toEpochMilli())
-                .setEventType(event.getEventType())
-                .build();
+        return value.toString();
     }
 }
