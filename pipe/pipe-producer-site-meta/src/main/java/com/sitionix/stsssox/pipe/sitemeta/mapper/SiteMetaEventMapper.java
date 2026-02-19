@@ -10,12 +10,9 @@ import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
 import com.sitionix.stsssox.domain.event.payload.SiteDeletedPayload;
 import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
 import com.sitionix.stsssox.domain.event.payload.SiteUpdatedPayload;
-import java.time.Instant;
-import java.util.UUID;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface SiteMetaEventMapper {
@@ -46,55 +43,38 @@ public interface SiteMetaEventMapper {
     @Mapping(target = "payload", expression = "java(this.asPayload(payload))")
     SiteMetaEnvelope asDeletedEnvelope(Event<SiteMetaPayload> event, SiteDeletedPayload payload);
 
-    @Mapping(target = "siteId", source = "site.siteId", qualifiedByName = "uuidToString")
+    @Mapping(target = "siteId",
+            expression = "java(payload.site().siteId() == null ? null : payload.site().siteId().toString())")
     @Mapping(target = "ownerUserId", source = "site.userId")
     @Mapping(target = "name", source = "site.name")
     @Mapping(target = "status", source = "site.status")
     @Mapping(target = "type", source = "site.type")
     @Mapping(target = "description", source = "site.description")
-    @Mapping(target = "createdAt", source = "site.createdAt", qualifiedByName = "instantToString")
-    @Mapping(target = "updatedAt", source = "site.updatedAt", qualifiedByName = "instantToString")
+    @Mapping(target = "createdAt",
+            expression = "java(payload.site().createdAt() == null ? null : payload.site().createdAt().toString())")
+    @Mapping(target = "updatedAt",
+            expression = "java(payload.site().updatedAt() == null ? null : payload.site().updatedAt().toString())")
     SiteCreatedEvent asPayload(SiteCreatedPayload payload);
 
-    @Mapping(target = "siteId", source = "site.siteId", qualifiedByName = "uuidToString")
+    @Mapping(target = "siteId",
+            expression = "java(payload.site().siteId() == null ? null : payload.site().siteId().toString())")
     @Mapping(target = "ownerUserId", source = "site.userId")
     @Mapping(target = "name", source = "site.name")
     @Mapping(target = "status", source = "site.status")
     @Mapping(target = "type", source = "site.type")
     @Mapping(target = "description", source = "site.description")
-    @Mapping(target = "updatedAt", source = "site.updatedAt", qualifiedByName = "instantToString")
+    @Mapping(target = "updatedAt",
+            expression = "java(payload.site().updatedAt() == null ? null : payload.site().updatedAt().toString())")
     SiteUpdatedEvent asPayload(SiteUpdatedPayload payload);
 
-    @Mapping(target = "siteId", source = "siteId", qualifiedByName = "uuidToString")
-    @Mapping(target = "deletedAt", source = "deletedAt", qualifiedByName = "instantToString")
+    @Mapping(target = "siteId", expression = "java(payload.siteId() == null ? null : payload.siteId().toString())")
+    @Mapping(target = "deletedAt", expression = "java(payload.deletedAt() == null ? null : payload.deletedAt().toString())")
     SiteDeletedEvent asPayload(SiteDeletedPayload payload);
 
-    @Mapping(target = "idempotencyId", source = "idempotencyId", qualifiedByName = "uuidToString")
-    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "instantToEpochMillis")
+    @Mapping(target = "idempotencyId",
+            expression = "java(event.getIdempotencyId() == null ? null : event.getIdempotencyId().toString())")
+    @Mapping(target = "createdAt",
+            expression = "java(event.getCreatedAt() == null ? null : event.getCreatedAt().toEpochMilli())")
     @Mapping(target = "eventType", source = "eventType")
     Metadata asMetadata(Event<SiteMetaPayload> event);
-
-    @Named("instantToString")
-    default String instantToString(final Instant value) {
-        if (value == null) {
-            return null;
-        }
-        return value.toString();
-    }
-
-    @Named("instantToEpochMillis")
-    default Long instantToEpochMillis(final Instant value) {
-        if (value == null) {
-            return null;
-        }
-        return value.toEpochMilli();
-    }
-
-    @Named("uuidToString")
-    default String uuidToString(final UUID value) {
-        if (value == null) {
-            return null;
-        }
-        return value.toString();
-    }
 }
