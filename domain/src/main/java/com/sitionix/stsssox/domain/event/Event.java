@@ -44,10 +44,10 @@ public class Event<T> {
     }
 
     public static Event<SiteMetaPayload> siteDeleted(final UUID siteId,
-                                                     final Long ownerUserId,
+                                                     final Long userId,
                                                      final Instant deletedAt) {
         return new Event<>(siteId.toString(),
-                new SiteDeletedPayload(siteId, ownerUserId, deletedAt),
+                new SiteDeletedPayload(siteId, userId, deletedAt),
                 SiteMetaEventType.SITE_DELETED.getValue(),
                 Instant.now());
     }

@@ -44,7 +44,7 @@ class SiteMetaEventMapperTest {
         final Metadata expectedMetadata = this.getMetadata(event);
         final SiteCreatedEvent expectedPayload = SiteCreatedEvent.newBuilder()
                 .setSiteId(site.siteId().toString())
-                .setOwnerUserId(site.userId())
+                .setUserId(site.userId())
                 .setName(site.name())
                 .setStatus(SiteStatusDTO.DRAFT)
                 .setType(SiteTypeDTO.PORTFOLIO)
@@ -69,7 +69,7 @@ class SiteMetaEventMapperTest {
         final Metadata expectedMetadata = this.getMetadata(event);
         final SiteUpdatedEvent expectedPayload = SiteUpdatedEvent.newBuilder()
                 .setSiteId(site.siteId().toString())
-                .setOwnerUserId(site.userId())
+                .setUserId(site.userId())
                 .setName(site.name())
                 .setStatus(SiteStatusDTO.PUBLISHED)
                 .setType(SiteTypeDTO.BUSINESS)
@@ -89,13 +89,13 @@ class SiteMetaEventMapperTest {
     void givenSiteDeletedEvent_whenAsEnvelope_thenReturnEnvelopeWithMetadataAndPayload() {
         //given
         final UUID siteId = UUID.fromString("80ac2f2c-e9da-4f8c-94da-fcae7b95c7cc");
-        final Long ownerUserId = 17L;
+        final Long userId = 17L;
         final Instant deletedAt = Instant.parse("2026-02-18T10:00:00Z");
-        final Event<SiteMetaPayload> event = Event.siteDeleted(siteId, ownerUserId, deletedAt);
+        final Event<SiteMetaPayload> event = Event.siteDeleted(siteId, userId, deletedAt);
         final Metadata expectedMetadata = this.getMetadata(event);
         final SiteDeletedEvent expectedPayload = SiteDeletedEvent.newBuilder()
                 .setSiteId(siteId.toString())
-                .setOwnerUserId(ownerUserId)
+                .setUserId(userId)
                 .setDeletedAt(deletedAt.toString())
                 .build();
 

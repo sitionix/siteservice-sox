@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record SiteDeletedPayload(
         UUID siteId,
-        Long ownerUserId,
+        Long userId,
         Instant deletedAt
 ) implements SiteMetaPayload {
 }

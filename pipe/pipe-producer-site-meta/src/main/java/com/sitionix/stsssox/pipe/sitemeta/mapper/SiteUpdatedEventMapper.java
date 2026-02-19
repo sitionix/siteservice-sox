@@ -17,7 +17,7 @@ public interface SiteUpdatedEventMapper extends EventMapper<SiteUpdatedPayload> 
     @Override
     @Mapping(target = "siteId",
             expression = "java(payload.site().siteId() == null ? null : payload.site().siteId().toString())")
-    @Mapping(target = "ownerUserId", source = "site.userId")
+    @Mapping(target = "userId", source = "site.userId")
     @Mapping(target = "name", source = "site.name")
     @Mapping(target = "status", source = "site.status")
     @Mapping(target = "type", source = "site.type")
