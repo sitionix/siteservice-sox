@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.afesox</groupId>
-            <artifactId>app-afesox-stsssox-event-sitemeta-producer-sitionix-80-unstable</artifactId>
+            <artifactId>app-afesox-stsssox-event-sitemeta-producer-stable</artifactId>
             <version>0.0.1</version>
         </dependency>
         <dependency>
