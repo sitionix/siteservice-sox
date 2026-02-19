@@ -13,6 +13,7 @@ import com.sitionix.stsssox.domain.SiteType;
 import com.sitionix.stsssox.domain.event.Event;
 import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,14 @@ class SiteMetaEventMapperTest {
 
     @BeforeEach
     void setUp() {
-        this.siteMetaEventMapper = new SiteMetaEventMapperImpl();
+        final SiteMetaMetadataMapper siteMetaMetadataMapper = new SiteMetaMetadataMapperImpl();
+        final EventMapper<? extends SiteMetaPayload> siteCreatedEventMapper = new SiteCreatedEventMapperImpl();
+        final EventMapper<? extends SiteMetaPayload> siteUpdatedEventMapper = new SiteUpdatedEventMapperImpl();
+        final EventMapper<? extends SiteMetaPayload> siteDeletedEventMapper = new SiteDeletedEventMapperImpl();
+        this.siteMetaEventMapper = new SiteMetaEventMapper(
+                siteMetaMetadataMapper,
+                List.of(siteCreatedEventMapper, siteUpdatedEventMapper, siteDeletedEventMapper)
+        );
     }
 
     @Test
