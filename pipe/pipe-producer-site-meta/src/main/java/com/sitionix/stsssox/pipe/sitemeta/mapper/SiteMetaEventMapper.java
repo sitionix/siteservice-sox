@@ -2,7 +2,7 @@ package com.sitionix.stsssox.pipe.sitemeta.mapper;
 
 import com.app_afesox.events.Metadata;
 import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
-import com.sitionix.stsssox.domain.event.Event;
+import com.sitionix.forge.outbox.core.model.Event;
 import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +16,7 @@ public class SiteMetaEventMapper {
     private final SiteMetaMetadataMapper siteMetaMetadataMapper;
     private final List<EventMapper<? extends SiteMetaPayload>> payloadMappers;
 
-    public SiteMetaEnvelope asEnvelope(final Event<SiteMetaPayload> event) {
+    public SiteMetaEnvelope asEnvelope(final Event<? extends SiteMetaPayload> event) {
         if (Objects.isNull(event) || Objects.isNull(event.getPayload())) {
             throw new IllegalArgumentException("Site meta event payload is required");
         }

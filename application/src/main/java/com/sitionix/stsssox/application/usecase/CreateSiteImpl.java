@@ -2,13 +2,14 @@ package com.sitionix.stsssox.application.usecase;
 
 import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.SiteStatus;
-import com.sitionix.stsssox.domain.event.Event;
-import com.sitionix.stsssox.domain.event.SiteMetaEventPublisher;
+import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
 import com.sitionix.stsssox.domain.exception.AuthenticationRequiredException;
 import com.sitionix.stsssox.domain.exception.SiteValidationException;
 import com.sitionix.stsssox.domain.model.CreateSiteCommand;
 import com.sitionix.stsssox.domain.repository.SiteRepository;
 import com.sitionix.stsssox.domain.usecase.CreateSite;
+import com.sitionix.forge.outbox.core.port.ForgeOutbox;
+import com.sitionix.forge.outbox.core.port.ForgeOutboxPayload;
 import com.sitionix.forge.security.server.user.ForgeUserClient;
 import java.time.Instant;
 import java.util.UUID;
@@ -22,7 +23,7 @@ public class CreateSiteImpl implements CreateSite {
 
     private final SiteRepository siteRepository;
     private final ForgeUserClient forgeUserClient;
-    private final SiteMetaEventPublisher siteMetaEventPublisher;
+    private final ForgeOutbox<ForgeOutboxPayload> forgeOutbox;
 
     @Override
     public Site execute(final CreateSiteCommand command) {
@@ -32,7 +33,7 @@ public class CreateSiteImpl implements CreateSite {
 
         final Site site = this.buildSite(command, userId, normalizedName, now);
         final Site savedSite = this.siteRepository.save(site);
-        this.siteMetaEventPublisher.publish(Event.siteCreated(savedSite));
+        this.forgeOutbox.send(new SiteCreatedPayload(savedSite));
         return savedSite;
     }
 

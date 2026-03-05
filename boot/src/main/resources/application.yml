@@ -13,6 +13,8 @@ spring:
       uuid-representation: standard
       auto-index-creation: true
 forge:
+  outbox:
+    domain-store: MONGO
   security:
     service-id: sitionixSite
     dev:

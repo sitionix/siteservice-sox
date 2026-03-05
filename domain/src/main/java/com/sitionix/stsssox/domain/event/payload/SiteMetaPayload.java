@@ -1,7 +1,9 @@
 package com.sitionix.stsssox.domain.event.payload;
 
+import com.sitionix.forge.outbox.core.port.ForgeOutboxPayload;
+
 /**
- * Marker interface for site metadata projection payloads.
+ * Outbox payload contract for site metadata projection events.
  */
-public interface SiteMetaPayload {
+public interface SiteMetaPayload extends ForgeOutboxPayload {
 }

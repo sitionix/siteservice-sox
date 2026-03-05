@@ -49,6 +49,11 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.sitionix.forge</groupId>
+            <artifactId>forgecommon-outbox-mongo</artifactId>
+            <version>${forge.common.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.sitionix.forgeit</groupId>
             <artifactId>forgeit</artifactId>
             <version>${forgeit.version}</version>
