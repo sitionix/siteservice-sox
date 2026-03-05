@@ -1,7 +1,6 @@
 package com.sitionix.stsssox.it.infra;
 
 import java.time.Instant;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,13 +20,6 @@ public class MongoOutboxEventEntity {
 
     private String eventType;
     private String payload;
-    private Map<String, String> headers;
-    private Map<String, String> metadata;
-    private String traceId;
-    private String aggregateType;
-    private Long aggregateId;
-    private String initiatorType;
-    private String initiatorId;
     private String status;
     private Integer attempts;
     private Instant nextAttemptAt;

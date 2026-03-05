@@ -9,7 +9,6 @@ import com.sitionix.stsssox.it.infra.OutboxKafkaContracts;
 import com.sitionix.stsssox.it.infra.TestManager;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,13 +36,6 @@ class OutboxWorkerIT {
                 "outbox-site-created-pending",
                 SiteCreatedPayload.EVENT_TYPE,
                 payload,
-                Map.of(),
-                Map.of(),
-                null,
-                null,
-                null,
-                null,
-                null,
                 "PENDING",
                 0,
                 createdAt.minusSeconds(30),
@@ -91,13 +83,6 @@ class OutboxWorkerIT {
                 "outbox-site-created-sent",
                 SiteCreatedPayload.EVENT_TYPE,
                 payload,
-                Map.of(),
-                Map.of(),
-                null,
-                null,
-                null,
-                null,
-                null,
                 "SENT",
                 0,
                 createdAt.minusSeconds(30),
@@ -137,13 +122,6 @@ class OutboxWorkerIT {
                 "outbox-site-created-failed",
                 SiteCreatedPayload.EVENT_TYPE,
                 payload,
-                Map.of(),
-                Map.of(),
-                null,
-                null,
-                null,
-                null,
-                null,
                 "FAILED",
                 2,
                 createdAt.minusSeconds(30),
