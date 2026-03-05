@@ -6,21 +6,21 @@ import com.sitionix.forge.outbox.core.model.Event;
 import com.sitionix.forge.outbox.core.port.ForgeTypedOutboxEventPublisher;
 import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
 import com.sitionix.stsssox.pipe.sitemeta.mapper.SiteMetaEventMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SiteMetaPublisherV1 extends ForgeTypedOutboxEventPublisher<SiteCreatedPayload> {
 
     private final SitemetaV1Producer producer;
     private final SiteMetaEventMapper mapper;
 
-    public SiteMetaPublisherV1(final SitemetaV1Producer producer,
-                               final SiteMetaEventMapper mapper) {
-        super(SiteCreatedPayload.class);
-        this.producer = producer;
-        this.mapper = mapper;
+    @Override
+    protected Class<SiteCreatedPayload> payloadClass() {
+        return SiteCreatedPayload.class;
     }
 
     @Override
