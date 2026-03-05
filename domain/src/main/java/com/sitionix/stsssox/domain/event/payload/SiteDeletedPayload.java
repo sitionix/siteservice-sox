@@ -28,9 +28,6 @@ public record SiteDeletedPayload(
 
     @Override
     public String traceId() {
-        if (this.siteId == null) {
-            return null;
-        }
-        return this.siteId.toString();
+        return null;
     }
 }

@@ -3,34 +3,28 @@ package com.sitionix.stsssox.pipe.sitemeta;
 import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
 import com.app_afesox.stsssox.events.sitemeta.kafka.SitemetaV1Producer;
 import com.sitionix.forge.outbox.core.model.Event;
-import com.sitionix.forge.outbox.core.port.ForgeOutboxEventPublisher;
-import com.sitionix.stsssox.domain.event.SiteMetaEventType;
+import com.sitionix.forge.outbox.core.port.ForgeTypedOutboxEventPublisher;
 import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
 import com.sitionix.stsssox.pipe.sitemeta.mapper.SiteMetaEventMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class SiteMetaPublisherV1 implements ForgeOutboxEventPublisher<SiteCreatedPayload> {
+public class SiteMetaPublisherV1 extends ForgeTypedOutboxEventPublisher<SiteCreatedPayload> {
 
     private final SitemetaV1Producer producer;
     private final SiteMetaEventMapper mapper;
 
-    @Override
-    public String eventType() {
-        return SiteMetaEventType.SITE_CREATED.getValue();
+    public SiteMetaPublisherV1(final SitemetaV1Producer producer,
+                               final SiteMetaEventMapper mapper) {
+        super(SiteCreatedPayload.class);
+        this.producer = producer;
+        this.mapper = mapper;
     }
 
     @Override
-    public Class<SiteCreatedPayload> payloadType() {
-        return SiteCreatedPayload.class;
-    }
-
-    @Override
-    public void publish(final Event<SiteCreatedPayload> event) {
+    protected void publish(final Event<SiteCreatedPayload> event) {
         log.info("Publish site meta event");
         final SiteMetaEnvelope envelope = this.mapper.asEnvelope(event);
         final String key = event.getPayload().site().siteId().toString();

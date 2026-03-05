@@ -28,9 +28,6 @@ public record SiteCreatedPayload(
 
     @Override
     public String traceId() {
-        if (this.site == null || this.site.siteId() == null) {
-            return null;
-        }
-        return this.site.siteId().toString();
+        return null;
     }
 }

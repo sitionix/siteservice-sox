@@ -4,7 +4,6 @@ import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
 import com.app_afesox.stsssox.events.sitemeta.kafka.SitemetaV1Producer;
 import com.sitionix.forge.outbox.core.model.Event;
 import com.sitionix.stsssox.domain.Site;
-import com.sitionix.stsssox.domain.event.SiteMetaEventType;
 import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
 import com.sitionix.stsssox.pipe.sitemeta.mapper.SiteMetaEventMapper;
 import java.util.UUID;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -44,28 +42,6 @@ class SiteMetaPublisherV1Test {
     }
 
     @Test
-    void givenPublisher_whenEventType_thenReturnSiteCreated() {
-        //given
-
-        //when
-        final String actual = this.siteMetaPublisherV1.eventType();
-
-        //then
-        assertThat(actual).isEqualTo(SiteMetaEventType.SITE_CREATED.getValue());
-    }
-
-    @Test
-    void givenPublisher_whenPayloadType_thenReturnSiteCreatedPayloadClass() {
-        //given
-
-        //when
-        final Class<SiteCreatedPayload> actual = this.siteMetaPublisherV1.payloadType();
-
-        //then
-        assertThat(actual).isEqualTo(SiteCreatedPayload.class);
-    }
-
-    @Test
     void givenEvent_whenPublish_thenSendEnvelope() {
         //given
         final Event<SiteCreatedPayload> event = mock(Event.class);
@@ -84,7 +60,7 @@ class SiteMetaPublisherV1Test {
         when(event.getIdempotencyId())
                 .thenReturn(idempotencyId);
         when(event.getEventType())
-                .thenReturn(SiteMetaEventType.SITE_CREATED.getValue());
+                .thenReturn("SITE_CREATED");
         when(this.mapper.asEnvelope(event))
                 .thenReturn(envelope);
 
