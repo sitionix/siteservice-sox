@@ -1,7 +1,7 @@
 package com.sitionix.stsssox.it;
 
 import com.sitionix.forgeit.core.test.IntegrationTest;
-import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
+import com.sitionix.stsssox.domain.event.SiteMetaEventType;
 import com.sitionix.stsssox.it.infra.ControllerEndpoint;
 import com.sitionix.stsssox.it.infra.MongoOutboxEventEntity;
 import com.sitionix.stsssox.it.infra.TestManager;
@@ -42,9 +42,9 @@ class SiteOutboxIT {
                 .get(MongoOutboxEventEntity.class)
                 .hasSize(1)
                 .singleElement()
-                .andExpected(entity -> Objects.equals(entity.getEventType(), SiteCreatedPayload.EVENT_TYPE))
+                .andExpected(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
                 .andExpected(entity -> Objects.equals(entity.getStatus(), "PENDING"))
-                .andExpected(entity -> Objects.equals(entity.getAttempts(), 0))
+                .andExpected(entity -> Objects.equals(entity.getRetryCount(), 0))
                 .andExpected(entity -> Objects.nonNull(entity.getCreatedAt()))
                 .andExpected(entity -> Objects.nonNull(entity.getUpdatedAt()))
                 .andExpected(entity -> entity.getPayload().contains("\"siteId\":\"" + site.getSiteId() + "\""))
@@ -115,7 +115,7 @@ class SiteOutboxIT {
         this.testManager.mongo()
                 .get(MongoOutboxEventEntity.class)
                 .hasSize(2)
-                .andExpected(entity -> Objects.equals(entity.getEventType(), SiteCreatedPayload.EVENT_TYPE))
+                .andExpected(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
                 .andExpected(entity -> Objects.equals(entity.getStatus(), "PENDING"))
                 .andExpected(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""))
                 .allMatch();

@@ -11,7 +11,6 @@ import com.sitionix.stsssox.domain.exception.SiteValidationException;
 import com.sitionix.stsssox.domain.model.CreateSiteCommand;
 import com.sitionix.stsssox.domain.repository.SiteRepository;
 import com.sitionix.forge.outbox.core.port.ForgeOutbox;
-import com.sitionix.forge.outbox.core.port.ForgeOutboxPayload;
 import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +41,7 @@ class CreateSiteImplTest {
     private ForgeUserClient forgeUserClient;
 
     @Mock
-    private ForgeOutbox<ForgeOutboxPayload> forgeOutbox;
+    private ForgeOutbox forgeOutbox;
 
     @BeforeEach
     void setUp() {
