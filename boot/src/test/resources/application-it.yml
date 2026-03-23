@@ -2,9 +2,9 @@ environment: it
 spring:
   main:
     allow-bean-definition-overriding: true
-  data:
-    mongodb:
-      uuid-representation: standard
+  jpa:
+    hibernate:
+      ddl-auto: none
 forge-it:
   modules:
     mock-mvc:

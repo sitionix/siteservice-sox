@@ -1,11 +1,11 @@
-package com.sitionix.stsssox.mongodb.repository;
+package com.sitionix.stsssox.postgresql.repository;
 
 import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.SiteStatus;
 import com.sitionix.stsssox.domain.SiteType;
-import com.sitionix.stsssox.mongodb.entity.site.SiteEntity;
-import com.sitionix.stsssox.mongodb.mapper.SiteInfraMapper;
-import com.sitionix.stsssox.mongodb.mongo.SiteMongoRepository;
+import com.sitionix.stsssox.postgresql.entity.site.SiteEntity;
+import com.sitionix.stsssox.postgresql.jpa.SiteJpaRepository;
+import com.sitionix.stsssox.postgresql.mapper.SiteInfraMapper;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class SiteRepositoryImplTest {
 
     @Mock
-    private SiteMongoRepository siteMongoRepository;
+    private SiteJpaRepository siteJpaRepository;
 
     @Mock
     private SiteInfraMapper siteInfraMapper;
@@ -34,12 +34,12 @@ class SiteRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
-        this.siteRepository = new SiteRepositoryImpl(this.siteMongoRepository, this.siteInfraMapper);
+        this.siteRepository = new SiteRepositoryImpl(this.siteJpaRepository, this.siteInfraMapper);
     }
 
     @AfterEach
     void tearDown() {
-        verifyNoMoreInteractions(this.siteMongoRepository, this.siteInfraMapper);
+        verifyNoMoreInteractions(this.siteJpaRepository, this.siteInfraMapper);
     }
 
     @Test
@@ -51,7 +51,7 @@ class SiteRepositoryImplTest {
         final Site expected = this.getSite();
 
         when(this.siteInfraMapper.asSiteEntity(given)).thenReturn(mappedEntity);
-        when(this.siteMongoRepository.save(mappedEntity)).thenReturn(persistedEntity);
+        when(this.siteJpaRepository.save(mappedEntity)).thenReturn(persistedEntity);
         when(this.siteInfraMapper.asSite(persistedEntity)).thenReturn(expected);
 
         //when
@@ -60,7 +60,7 @@ class SiteRepositoryImplTest {
         //then
         assertThat(actual).isEqualTo(expected);
         verify(this.siteInfraMapper).asSiteEntity(given);
-        verify(this.siteMongoRepository).save(mappedEntity);
+        verify(this.siteJpaRepository).save(mappedEntity);
         verify(this.siteInfraMapper).asSite(persistedEntity);
     }
 
@@ -72,7 +72,7 @@ class SiteRepositoryImplTest {
         final Site site = this.getSite();
         final Optional<Site> expected = Optional.of(site);
 
-        when(this.siteMongoRepository.findById(given)).thenReturn(Optional.of(siteEntity));
+        when(this.siteJpaRepository.findById(given)).thenReturn(Optional.of(siteEntity));
         when(this.siteInfraMapper.asSite(siteEntity)).thenReturn(site);
 
         //when
@@ -80,7 +80,7 @@ class SiteRepositoryImplTest {
 
         //then
         assertThat(actual).isEqualTo(expected);
-        verify(this.siteMongoRepository).findById(given);
+        verify(this.siteJpaRepository).findById(given);
         verify(this.siteInfraMapper).asSite(siteEntity);
     }
 
@@ -90,14 +90,14 @@ class SiteRepositoryImplTest {
         final UUID given = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         final Optional<Site> expected = Optional.empty();
 
-        when(this.siteMongoRepository.findById(given)).thenReturn(Optional.empty());
+        when(this.siteJpaRepository.findById(given)).thenReturn(Optional.empty());
 
         //when
         final Optional<Site> actual = this.siteRepository.findById(given);
 
         //then
         assertThat(actual).isEqualTo(expected);
-        verify(this.siteMongoRepository).findById(given);
+        verify(this.siteJpaRepository).findById(given);
     }
 
     private Site getSite() {
