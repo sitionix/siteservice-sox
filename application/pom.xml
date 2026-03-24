@@ -24,18 +24,9 @@
             <artifactId>spring-boot</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.sitionix.forge</groupId>
             <artifactId>forge-security-server</artifactId>
             <version>${forge.security.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sitionix.forge</groupId>
-            <artifactId>forgecommon-outbox-core</artifactId>
-            <version>${forge.common.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

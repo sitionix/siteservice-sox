@@ -3,6 +3,7 @@ package com.sitionix.stsssox.pipe.sitemeta;
 import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
 import com.app_afesox.stsssox.events.sitemeta.kafka.SitemetaV1Producer;
 import com.sitionix.stsssox.domain.event.Event;
+import com.sitionix.stsssox.domain.event.SiteMetaEventPublisher;
 import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
 import com.sitionix.stsssox.pipe.sitemeta.mapper.SiteMetaEventMapper;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +15,12 @@ import static java.util.Objects.isNull;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SiteMetaPublisherV1 {
+public class SiteMetaPublisherV1 implements SiteMetaEventPublisher {
 
     private final SitemetaV1Producer producer;
     private final SiteMetaEventMapper mapper;
 
+    @Override
     public void publish(final Event<SiteMetaPayload> event) {
         log.info("Publishing site meta projection event: {}", event);
         if (isNull(event)) {
