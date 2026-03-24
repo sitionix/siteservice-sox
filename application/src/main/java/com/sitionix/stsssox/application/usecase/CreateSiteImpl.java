@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class CreateSiteImpl implements CreateSite {
     private final SiteMetaEventPublisher siteMetaEventPublisher;
 
     @Override
+    @Transactional
     public Site execute(final CreateSiteCommand command) {
         final Long userId = this.getUserId();
         final String normalizedName = this.normalizeAndValidateName(command.name());
