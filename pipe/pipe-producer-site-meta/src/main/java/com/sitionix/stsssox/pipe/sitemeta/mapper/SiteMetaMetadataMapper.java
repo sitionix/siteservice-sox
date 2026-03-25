@@ -1,8 +1,7 @@
 package com.sitionix.stsssox.pipe.sitemeta.mapper;
 
 import com.app_afesox.events.Metadata;
-import com.sitionix.stsssox.domain.event.Event;
-import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
+import com.sitionix.forge.outbox.core.model.Event;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,5 +14,5 @@ public interface SiteMetaMetadataMapper {
     @Mapping(target = "createdAt",
             expression = "java(event.getCreatedAt() == null ? null : event.getCreatedAt().toEpochMilli())")
     @Mapping(target = "eventType", source = "eventType")
-    Metadata asMetadata(Event<SiteMetaPayload> event);
+    Metadata asMetadata(Event<?> event);
 }

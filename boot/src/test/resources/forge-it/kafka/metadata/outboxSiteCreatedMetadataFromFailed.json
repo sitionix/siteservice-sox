@@ -1,0 +1,5 @@
+{
+  "idempotencyId": "33333333-3333-3333-3333-333333333333",
+  "createdAt": 1772619600000,
+  "eventType": "SITE_CREATED"
+}
