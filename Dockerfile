@@ -9,7 +9,7 @@ COPY domain/pom.xml domain/pom.xml
 COPY pipe/pom.xml pipe/pom.xml
 COPY pipe/pipe-producer-site-meta/pom.xml pipe/pipe-producer-site-meta/pom.xml
 COPY infrastructure/pom.xml infrastructure/pom.xml
-COPY infrastructure/mongodb/pom.xml infrastructure/mongodb/pom.xml
+COPY infrastructure/postgresql/pom.xml infrastructure/postgresql/pom.xml
 COPY jacoco-report/pom.xml jacoco-report/pom.xml
 COPY boot/src boot/src
 COPY api-rest/src api-rest/src

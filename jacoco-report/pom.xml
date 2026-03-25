@@ -52,7 +52,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mongodb</artifactId>
+            <artifactId>postgresql</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

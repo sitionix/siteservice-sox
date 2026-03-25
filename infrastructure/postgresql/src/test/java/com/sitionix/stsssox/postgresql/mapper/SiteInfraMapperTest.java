@@ -1,9 +1,9 @@
-package com.sitionix.stsssox.mongodb.mapper;
+package com.sitionix.stsssox.postgresql.mapper;
 
 import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.SiteStatus;
 import com.sitionix.stsssox.domain.SiteType;
-import com.sitionix.stsssox.mongodb.entity.site.SiteEntity;
+import com.sitionix.stsssox.postgresql.entity.site.SiteEntity;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
