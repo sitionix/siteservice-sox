@@ -46,11 +46,17 @@ class SiteOutboxIT {
         final ForgeOutboxEventEntity event = events.get(0);
         assertThat(event.getEventType()).isEqualTo(SiteMetaEventType.SITE_CREATED.getValue());
         assertThat(event.getIdempotencyId()).isNotNull();
+        assertThat(event.getAggregateTypeId()).isEqualTo(1L);
+        assertThat(event.getAggregateId()).isEqualTo(site.getUserId());
         assertThat(event.getStatusId()).isEqualTo(1L);
         assertThat(event.getRetryCount()).isZero();
+        assertThat(event.getNextRetryAt()).isNotNull();
+        assertThat(event.getLastError()).isNull();
+        assertThat(event.getLockUntil()).isNull();
         assertThat(event.getTraceId()).isNull();
         assertThat(event.getCreatedAt()).isNotNull();
         assertThat(event.getUpdatedAt()).isNotNull();
+        assertThat(event.getNextRetryAt()).isAfterOrEqualTo(event.getCreatedAt());
         assertThat(event.getPayload()).contains("\"siteId\":\"" + site.getSiteId() + "\"");
         assertThat(event.getPayload()).contains("\"name\":\"Portfolio\"");
         assertThat(event.getPayload()).contains("\"status\":\"DRAFT\"");
