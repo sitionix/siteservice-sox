@@ -8,7 +8,7 @@ import com.sitionix.forgeit.core.test.IntegrationTest;
 import com.sitionix.stsssox.it.infra.OutboxKafkaContracts;
 import com.sitionix.stsssox.it.infra.TestManager;
 import java.time.Duration;
-import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,14 +46,14 @@ class OutboxWorkerIT {
                 .assertPayload()
                 .assertMetadata(envelope -> {
                 });
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        final ForgeOutboxEventEntity event = events.get(0);
-        assertThat(event.getStatusId()).isEqualTo(3L);
-        assertThat(event.getRetryCount()).isZero();
-        assertThat(event.getLastError()).isNull();
-        assertThat(event.getLockUntil()).isNull();
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 3L))
+                .andExpected(entity -> Objects.equals(entity.getRetryCount(), 0))
+                .andExpected(entity -> Objects.isNull(entity.getLastError()))
+                .andExpected(entity -> Objects.isNull(entity.getLockUntil()))
+                .assertEntity();
     }
 
     @Test
@@ -77,10 +77,11 @@ class OutboxWorkerIT {
                 .consume(OutboxKafkaContracts.SITE_META_CREATED_EVENT_KAFKA_CONTRACT)
                 .await(Duration.ofSeconds(3))
                 .assertNone();
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        assertThat(events.get(0).getStatusId()).isEqualTo(3L);
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 3L))
+                .assertEntity();
     }
 
     @Test
@@ -104,14 +105,14 @@ class OutboxWorkerIT {
                 .consume(OutboxKafkaContracts.SITE_META_CREATED_EVENT_KAFKA_CONTRACT)
                 .assertPayload("outboxSiteCreatedEventFromFailed.json")
                 .assertMetadata("outboxSiteCreatedMetadataFromFailed.json");
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        final ForgeOutboxEventEntity event = events.get(0);
-        assertThat(event.getStatusId()).isEqualTo(3L);
-        assertThat(event.getRetryCount()).isEqualTo(2);
-        assertThat(event.getLastError()).isNull();
-        assertThat(event.getLockUntil()).isNull();
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 3L))
+                .andExpected(entity -> Objects.equals(entity.getRetryCount(), 2))
+                .andExpected(entity -> Objects.isNull(entity.getLastError()))
+                .andExpected(entity -> Objects.isNull(entity.getLockUntil()))
+                .assertEntity();
     }
 
     @Test
@@ -135,10 +136,11 @@ class OutboxWorkerIT {
                 .consume(OutboxKafkaContracts.SITE_META_CREATED_EVENT_KAFKA_CONTRACT)
                 .await(Duration.ofSeconds(3))
                 .assertNone();
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        assertThat(events.get(0).getStatusId()).isEqualTo(1L);
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 1L))
+                .assertEntity();
     }
 
     @Test
@@ -162,11 +164,12 @@ class OutboxWorkerIT {
                 .consume(OutboxKafkaContracts.SITE_META_CREATED_EVENT_KAFKA_CONTRACT)
                 .await(Duration.ofSeconds(3))
                 .assertNone();
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        assertThat(events.get(0).getStatusId()).isEqualTo(2L);
-        assertThat(events.get(0).getLockUntil()).isNotNull();
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 2L))
+                .andExpected(entity -> Objects.nonNull(entity.getLockUntil()))
+                .assertEntity();
     }
 
     @Test
@@ -190,10 +193,11 @@ class OutboxWorkerIT {
                 .consume(OutboxKafkaContracts.SITE_META_CREATED_EVENT_KAFKA_CONTRACT)
                 .assertPayload()
                 .assertMetadata("outboxSiteCreatedMetadataFromExpiredLock.json");
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        assertThat(events.get(0).getStatusId()).isEqualTo(3L);
-        assertThat(events.get(0).getLockUntil()).isNull();
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 3L))
+                .andExpected(entity -> Objects.isNull(entity.getLockUntil()))
+                .assertEntity();
     }
 }

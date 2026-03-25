@@ -40,26 +40,28 @@ class SiteOutboxIT {
                 .singleElement()
                 .assertEntity();
 
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        final ForgeOutboxEventEntity event = events.get(0);
-        assertThat(event.getEventType()).isEqualTo(SiteMetaEventType.SITE_CREATED.getValue());
-        assertThat(event.getIdempotencyId()).isNotNull();
-        assertThat(event.getAggregateTypeId()).isEqualTo(1L);
-        assertThat(event.getAggregateId()).isEqualTo(site.getUserId());
-        assertThat(event.getStatusId()).isEqualTo(1L);
-        assertThat(event.getRetryCount()).isZero();
-        assertThat(event.getNextRetryAt()).isNotNull();
-        assertThat(event.getLastError()).isNull();
-        assertThat(event.getLockUntil()).isNull();
-        assertThat(event.getTraceId()).isNull();
-        assertThat(event.getCreatedAt()).isNotNull();
-        assertThat(event.getUpdatedAt()).isNotNull();
-        assertThat(event.getNextRetryAt()).isAfterOrEqualTo(event.getCreatedAt());
-        assertThat(event.getPayload()).contains("\"siteId\":\"" + site.getSiteId() + "\"");
-        assertThat(event.getPayload()).contains("\"name\":\"Portfolio\"");
-        assertThat(event.getPayload()).contains("\"status\":\"DRAFT\"");
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
+                .andExpected(entity -> Objects.nonNull(entity.getIdempotencyId()))
+                .andExpected(entity -> Objects.equals(entity.getAggregateTypeId(), 1L))
+                .andExpected(entity -> Objects.equals(entity.getAggregateId(), site.getUserId()))
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 1L))
+                .andExpected(entity -> Objects.equals(entity.getRetryCount(), 0))
+                .andExpected(entity -> Objects.nonNull(entity.getNextRetryAt()))
+                .andExpected(entity -> Objects.isNull(entity.getLastError()))
+                .andExpected(entity -> Objects.isNull(entity.getLockUntil()))
+                .andExpected(entity -> Objects.isNull(entity.getTraceId()))
+                .andExpected(entity -> Objects.nonNull(entity.getCreatedAt()))
+                .andExpected(entity -> Objects.nonNull(entity.getUpdatedAt()))
+                .andExpected(entity -> Objects.nonNull(entity.getNextRetryAt())
+                        && Objects.nonNull(entity.getCreatedAt())
+                        && !entity.getNextRetryAt().isBefore(entity.getCreatedAt()))
+                .andExpected(entity -> entity.getPayload().contains("\"siteId\":\"" + site.getSiteId() + "\""))
+                .andExpected(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""))
+                .andExpected(entity -> entity.getPayload().contains("\"status\":\"DRAFT\""))
+                .assertEntity();
     }
 
     @Test

@@ -10,7 +10,6 @@ import com.sitionix.forgeit.core.test.IntegrationTest;
 import com.sitionix.stsssox.it.infra.OutboxKafkaContracts;
 import com.sitionix.stsssox.it.infra.TestManager;
 import java.time.Duration;
-import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,15 +58,18 @@ class OutboxWorkerFailureIT {
                 .await(Duration.ofSeconds(3))
                 .assertNone();
 
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        final ForgeOutboxEventEntity event = events.get(0);
-        assertThat(event.getStatusId()).isEqualTo(4L);
-        assertThat(event.getRetryCount()).isEqualTo(1);
-        assertThat(event.getLastError()).contains("Forced publish failure");
-        assertThat(event.getLockUntil()).isNull();
-        assertThat(event.getNextRetryAt()).isAfter(event.getUpdatedAt());
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 4L))
+                .andExpected(entity -> Objects.equals(entity.getRetryCount(), 1))
+                .andExpected(entity -> Objects.nonNull(entity.getLastError())
+                        && entity.getLastError().contains("Forced publish failure"))
+                .andExpected(entity -> Objects.isNull(entity.getLockUntil()))
+                .andExpected(entity -> Objects.nonNull(entity.getNextRetryAt())
+                        && Objects.nonNull(entity.getUpdatedAt())
+                        && entity.getNextRetryAt().isAfter(entity.getUpdatedAt()))
+                .assertEntity();
     }
 
     @Test
@@ -95,14 +97,15 @@ class OutboxWorkerFailureIT {
                 .await(Duration.ofSeconds(3))
                 .assertNone();
 
-        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
-                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(1);
-        final ForgeOutboxEventEntity event = events.get(0);
-        assertThat(event.getStatusId()).isEqualTo(5L);
-        assertThat(event.getRetryCount()).isEqualTo(5);
-        assertThat(event.getLastError()).contains("Forced publish failure");
-        assertThat(event.getLockUntil()).isNull();
-        assertThat(Objects.nonNull(event.getNextRetryAt())).isTrue();
+        this.testManager.postgresql()
+                .get(ForgeOutboxEventEntity.class)
+                .singleElement()
+                .andExpected(entity -> Objects.equals(entity.getStatusId(), 5L))
+                .andExpected(entity -> Objects.equals(entity.getRetryCount(), 5))
+                .andExpected(entity -> Objects.nonNull(entity.getLastError())
+                        && entity.getLastError().contains("Forced publish failure"))
+                .andExpected(entity -> Objects.isNull(entity.getLockUntil()))
+                .andExpected(entity -> Objects.nonNull(entity.getNextRetryAt()))
+                .assertEntity();
     }
 }
