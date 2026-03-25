@@ -27,6 +27,9 @@ public class MongoOutboxEventEntity {
     @Field("payload")
     private String payload;
 
+    @Field("idempotencyId")
+    private String idempotencyId;
+
     @Field("traceId")
     private String traceId;
 
@@ -43,7 +46,7 @@ public class MongoOutboxEventEntity {
     private Integer retryCount;
 
     @Field("nextAttemptAt")
-    private Instant nextRetryAt;
+    private Instant nextAttemptAt;
 
     @Field("lastError")
     private String lastError;
