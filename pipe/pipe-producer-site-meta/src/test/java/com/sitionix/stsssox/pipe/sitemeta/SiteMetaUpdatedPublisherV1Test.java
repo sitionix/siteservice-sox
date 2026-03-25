@@ -4,7 +4,7 @@ import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
 import com.app_afesox.stsssox.events.sitemeta.kafka.SitemetaV1Producer;
 import com.sitionix.forge.outbox.core.model.Event;
 import com.sitionix.stsssox.domain.Site;
-import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
+import com.sitionix.stsssox.domain.event.payload.SiteUpdatedPayload;
 import com.sitionix.stsssox.pipe.sitemeta.mapper.SiteMetaEventMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -21,9 +21,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SiteMetaPublisherV1Test {
+class SiteMetaUpdatedPublisherV1Test {
 
-    private SiteMetaPublisherV1 siteMetaPublisherV1;
+    private SiteMetaUpdatedPublisherV1 siteMetaUpdatedPublisherV1;
 
     @Mock
     private SitemetaV1Producer producer;
@@ -33,7 +33,7 @@ class SiteMetaPublisherV1Test {
 
     @BeforeEach
     void setUp() {
-        this.siteMetaPublisherV1 = new SiteMetaPublisherV1(this.producer, this.mapper);
+        this.siteMetaUpdatedPublisherV1 = new SiteMetaUpdatedPublisherV1(this.producer, this.mapper);
     }
 
     @AfterEach
@@ -43,21 +43,21 @@ class SiteMetaPublisherV1Test {
     }
 
     @Test
-    void givenPublisher_whenPayloadClass_thenReturnSiteCreatedPayloadClass() {
+    void givenPublisher_whenPayloadClass_thenReturnSiteUpdatedPayloadClass() {
         //given
 
         //when
-        final Class<SiteCreatedPayload> payloadClass = this.siteMetaPublisherV1.payloadClass();
+        final Class<SiteUpdatedPayload> payloadClass = this.siteMetaUpdatedPublisherV1.payloadClass();
 
         //then
-        assertThat(payloadClass).isEqualTo(SiteCreatedPayload.class);
+        assertThat(payloadClass).isEqualTo(SiteUpdatedPayload.class);
     }
 
     @Test
     void givenEvent_whenPublish_thenSendEnvelope() {
         //given
-        final Event<SiteCreatedPayload> event = mock(Event.class);
-        final SiteCreatedPayload payload = mock(SiteCreatedPayload.class);
+        final Event<SiteUpdatedPayload> event = mock(Event.class);
+        final SiteUpdatedPayload payload = mock(SiteUpdatedPayload.class);
         final Site site = mock(Site.class);
         final SiteMetaEnvelope envelope = mock(SiteMetaEnvelope.class);
         final UUID siteId = UUID.fromString("8fd6adf3-58a9-4d55-9c70-1ce080cae8f9");
@@ -72,12 +72,12 @@ class SiteMetaPublisherV1Test {
         when(event.getIdempotencyId())
                 .thenReturn(idempotencyId);
         when(event.getEventType())
-                .thenReturn("SITE_CREATED");
+                .thenReturn("SITE_UPDATED");
         when(this.mapper.asEnvelope(event))
                 .thenReturn(envelope);
 
         //when
-        this.siteMetaPublisherV1.publish(event);
+        this.siteMetaUpdatedPublisherV1.publish(event);
 
         //then
         verify(this.mapper).asEnvelope(event);
