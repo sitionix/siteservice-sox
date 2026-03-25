@@ -9,6 +9,7 @@ import com.sitionix.stsssox.domain.model.CreateSiteCommand;
 import com.sitionix.stsssox.domain.repository.SiteRepository;
 import com.sitionix.stsssox.domain.usecase.CreateSite;
 import com.sitionix.forge.outbox.core.port.ForgeOutbox;
+import com.sitionix.forge.outbox.core.port.ForgeOutboxPayload;
 import com.sitionix.forge.security.server.user.ForgeUserClient;
 import java.time.Instant;
 import java.util.UUID;
@@ -22,7 +23,7 @@ public class CreateSiteImpl implements CreateSite {
 
     private final SiteRepository siteRepository;
     private final ForgeUserClient forgeUserClient;
-    private final ForgeOutbox forgeOutbox;
+    private final ForgeOutbox<ForgeOutboxPayload> forgeOutbox;
 
     @Override
     public Site execute(final CreateSiteCommand command) {

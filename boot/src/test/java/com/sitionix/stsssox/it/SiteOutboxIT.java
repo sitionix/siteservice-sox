@@ -113,12 +113,11 @@ class SiteOutboxIT {
         //then
         final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
                 .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
-        assertThat(events).hasSize(2);
         assertThat(events)
+                .hasSize(2)
                 .allMatch(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
                 .allMatch(entity -> Objects.equals(entity.getStatusId(), 1L))
-                .allMatch(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""));
-        assertThat(events)
+                .allMatch(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""))
                 .extracting(ForgeOutboxEventEntity::getId)
                 .doesNotHaveDuplicates();
     }
