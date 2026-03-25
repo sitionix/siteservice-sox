@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -39,17 +38,6 @@ class SiteMetaDeletedPublisherV1Test {
     void tearDown() {
         verifyNoMoreInteractions(this.producer,
                 this.mapper);
-    }
-
-    @Test
-    void givenPublisher_whenPayloadClass_thenReturnSiteDeletedPayloadClass() {
-        //given
-
-        //when
-        final Class<SiteDeletedPayload> payloadClass = this.siteMetaDeletedPublisherV1.payloadClass();
-
-        //then
-        assertThat(payloadClass).isEqualTo(SiteDeletedPayload.class);
     }
 
     @Test

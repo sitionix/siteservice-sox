@@ -35,7 +35,9 @@ class OutboxWorkerIT {
         //then
         this.testManager.kafka()
                 .consume(OutboxKafkaContracts.SITE_META_CREATED_EVENT_KAFKA_CONTRACT)
-                .assertPayload();
+                .assertPayload()
+                .assertMetadata(envelope -> {
+                });
     }
 
     @Test
@@ -74,6 +76,7 @@ class OutboxWorkerIT {
         //then
         this.testManager.kafka()
                 .consume(OutboxKafkaContracts.SITE_META_CREATED_EVENT_KAFKA_CONTRACT)
-                .assertPayload("outboxSiteCreatedEventFromFailed.json");
+                .assertPayload("outboxSiteCreatedEventFromFailed.json")
+                .assertMetadata("outboxSiteCreatedMetadataFromFailed.json");
     }
 }

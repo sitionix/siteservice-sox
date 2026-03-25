@@ -19,11 +19,6 @@ public class SiteMetaPublisherV1 implements ForgeOutboxEventPublisher<SiteCreate
     private final SiteMetaEventMapper mapper;
 
     @Override
-    public Class<SiteCreatedPayload> payloadClass() {
-        return SiteCreatedPayload.class;
-    }
-
-    @Override
     public void publish(final Event<SiteCreatedPayload> event) {
         log.info("Publish site meta event");
         final SiteMetaEnvelope envelope = this.mapper.asEnvelope(event);

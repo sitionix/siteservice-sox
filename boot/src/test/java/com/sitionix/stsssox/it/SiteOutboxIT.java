@@ -45,8 +45,10 @@ class SiteOutboxIT {
         assertThat(events).hasSize(1);
         final ForgeOutboxEventEntity event = events.get(0);
         assertThat(event.getEventType()).isEqualTo(SiteMetaEventType.SITE_CREATED.getValue());
+        assertThat(event.getIdempotencyId()).isNotNull();
         assertThat(event.getStatusId()).isEqualTo(1L);
         assertThat(event.getRetryCount()).isZero();
+        assertThat(event.getTraceId()).isNull();
         assertThat(event.getCreatedAt()).isNotNull();
         assertThat(event.getUpdatedAt()).isNotNull();
         assertThat(event.getPayload()).contains("\"siteId\":\"" + site.getSiteId() + "\"");
@@ -116,9 +118,14 @@ class SiteOutboxIT {
         assertThat(events)
                 .hasSize(2)
                 .allMatch(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
+                .allMatch(entity -> Objects.nonNull(entity.getIdempotencyId()))
                 .allMatch(entity -> Objects.equals(entity.getStatusId(), 1L))
                 .allMatch(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""))
                 .extracting(ForgeOutboxEventEntity::getId)
+                .doesNotHaveDuplicates();
+
+        assertThat(events)
+                .extracting(ForgeOutboxEventEntity::getIdempotencyId)
                 .doesNotHaveDuplicates();
     }
 }
