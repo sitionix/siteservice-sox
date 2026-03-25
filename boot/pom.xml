@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mongodb</artifactId>
+            <artifactId>postgresql</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- DEPENDENCY -->
@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>com.sitionix.forge</groupId>
-            <artifactId>forgecommon-outbox-mongo</artifactId>
+            <artifactId>forgecommon-outbox-postgres</artifactId>
             <version>${forge.common.version}</version>
         </dependency>
         <dependency>
@@ -60,8 +60,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.sitionix.forge</groupId>
+            <artifactId>forgecommon-outbox-testkit</artifactId>
+            <version>${forge.common.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>mongodb</artifactId>
+            <artifactId>postgresql</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>

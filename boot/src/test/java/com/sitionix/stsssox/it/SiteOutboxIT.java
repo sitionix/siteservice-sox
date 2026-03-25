@@ -1,11 +1,13 @@
 package com.sitionix.stsssox.it;
 
+import com.sitionix.forge.outbox.postgres.entity.ForgeOutboxEventEntity;
+import com.sitionix.forge.outbox.testkit.postgres.contract.ForgeOutboxPostgresDbContracts;
 import com.sitionix.forgeit.core.test.IntegrationTest;
 import com.sitionix.stsssox.domain.event.SiteMetaEventType;
 import com.sitionix.stsssox.it.infra.ControllerEndpoint;
-import com.sitionix.stsssox.it.infra.MongoOutboxEventEntity;
+import com.sitionix.stsssox.it.infra.DatabaseContract;
 import com.sitionix.stsssox.it.infra.TestManager;
-import com.sitionix.stsssox.mongodb.entity.site.SiteEntity;
+import com.sitionix.stsssox.postgresql.entity.site.SiteEntity;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
@@ -32,25 +34,25 @@ class SiteOutboxIT {
                 .assertDefault();
 
         //then
-        final SiteEntity site = this.testManager.mongo()
+        final SiteEntity site = this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(1)
                 .singleElement()
                 .assertEntity();
 
-        this.testManager.mongo()
-                .get(MongoOutboxEventEntity.class)
-                .hasSize(1)
-                .singleElement()
-                .andExpected(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
-                .andExpected(entity -> Objects.equals(entity.getStatus(), "PENDING"))
-                .andExpected(entity -> Objects.equals(entity.getRetryCount(), 0))
-                .andExpected(entity -> Objects.nonNull(entity.getCreatedAt()))
-                .andExpected(entity -> Objects.nonNull(entity.getUpdatedAt()))
-                .andExpected(entity -> entity.getPayload().contains("\"siteId\":\"" + site.getSiteId() + "\""))
-                .andExpected(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""))
-                .andExpected(entity -> entity.getPayload().contains("\"status\":\"DRAFT\""))
-                .assertEntity();
+        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
+                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
+        assertThat(events).hasSize(1);
+        final ForgeOutboxEventEntity event = events.get(0);
+        assertThat(event.getEventType()).isEqualTo(SiteMetaEventType.SITE_CREATED.getValue());
+        assertThat(event.getStatusId()).isEqualTo(1L);
+        assertThat(event.getRetryCount()).isZero();
+        assertThat(event.getIdempotencyId()).isNotNull();
+        assertThat(event.getCreatedAt()).isNotNull();
+        assertThat(event.getUpdatedAt()).isNotNull();
+        assertThat(event.getPayload()).contains("\"siteId\":\"" + site.getSiteId() + "\"");
+        assertThat(event.getPayload()).contains("\"name\":\"Portfolio\"");
+        assertThat(event.getPayload()).contains("\"status\":\"DRAFT\"");
     }
 
     @Test
@@ -66,12 +68,11 @@ class SiteOutboxIT {
                         .mutateRequest(request -> request.setName("   ")));
 
         //then
-        this.testManager.mongo()
-                .get(SiteEntity.class)
+        this.testManager.postgresql()
+                .assertEntities(DatabaseContract.SITE_ENTITY_DB_CONTRACT)
                 .hasSize(0);
-
-        this.testManager.mongo()
-                .get(MongoOutboxEventEntity.class)
+        this.testManager.postgresql()
+                .assertEntities(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT)
                 .hasSize(0);
     }
 
@@ -88,12 +89,11 @@ class SiteOutboxIT {
                 .assertDefault();
 
         //then
-        this.testManager.mongo()
-                .get(SiteEntity.class)
+        this.testManager.postgresql()
+                .assertEntities(DatabaseContract.SITE_ENTITY_DB_CONTRACT)
                 .hasSize(0);
-
-        this.testManager.mongo()
-                .get(MongoOutboxEventEntity.class)
+        this.testManager.postgresql()
+                .assertEntities(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT)
                 .hasSize(0);
     }
 
@@ -112,19 +112,15 @@ class SiteOutboxIT {
                 .assertDefault();
 
         //then
-        this.testManager.mongo()
-                .get(MongoOutboxEventEntity.class)
-                .hasSize(2)
-                .andExpected(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
-                .andExpected(entity -> Objects.equals(entity.getStatus(), "PENDING"))
-                .andExpected(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""))
-                .allMatch();
-
-        final List<MongoOutboxEventEntity> events = this.testManager.mongo()
-                .get(MongoOutboxEventEntity.class)
-                .getAll();
+        final List<ForgeOutboxEventEntity> events = this.testManager.postgresql()
+                .get(ForgeOutboxPostgresDbContracts.FORGE_OUTBOX_EVENT_ENTITY_DB_CONTRACT);
+        assertThat(events).hasSize(2);
         assertThat(events)
-                .extracting(MongoOutboxEventEntity::getId)
+                .allMatch(entity -> Objects.equals(entity.getEventType(), SiteMetaEventType.SITE_CREATED.getValue()))
+                .allMatch(entity -> Objects.equals(entity.getStatusId(), 1L))
+                .allMatch(entity -> entity.getPayload().contains("\"name\":\"Portfolio\""));
+        assertThat(events)
+                .extracting(ForgeOutboxEventEntity::getId)
                 .doesNotHaveDuplicates();
     }
 }

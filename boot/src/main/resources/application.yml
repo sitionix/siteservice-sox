@@ -6,15 +6,17 @@ server:
 spring:
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-  data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017}
-      database: ${MONGODB_DATABASE:SITES_SOX}
-      uuid-representation: standard
-      auto-index-creation: true
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/SITES_SOX}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres-pwd}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
 forge:
   outbox:
-    domain-store: MONGO
+    domain-store: POSTGRES
   security:
     service-id: sitionixSite
     dev:

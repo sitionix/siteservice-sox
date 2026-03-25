@@ -75,7 +75,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>mongodb</artifactId>
+                <artifactId>postgresql</artifactId>
             </dependency>
             <!-- DEPENDENCY -->
             <dependency>

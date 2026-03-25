@@ -1,0 +1,14 @@
+{
+  "id": 1001,
+  "eventType": "SITE_CREATED",
+  "payload": "{\"site\":{\"siteId\":\"55db7314-63a5-49b5-bdb6-6a6cc59e61b9\",\"userId\":17,\"name\":\"Site A\",\"status\":\"DRAFT\",\"createdAt\":\"2026-03-04T10:00:00Z\",\"updatedAt\":\"2026-03-04T10:00:00Z\",\"type\":\"PORTFOLIO\",\"description\":\"Description A\"}}",
+  "idempotencyId": "66f220ca-d61a-4d34-b4d5-fcb7a8c17f7f",
+  "traceId": "55db7314-63a5-49b5-bdb6-6a6cc59e61b9",
+  "aggregateTypeId": 1,
+  "aggregateId": 17,
+  "statusId": 1,
+  "retryCount": 0,
+  "nextRetryAt": "2026-03-04T09:59:30Z",
+  "createdAt": "2026-03-04T10:00:00Z",
+  "updatedAt": "2026-03-04T10:00:00Z"
+}

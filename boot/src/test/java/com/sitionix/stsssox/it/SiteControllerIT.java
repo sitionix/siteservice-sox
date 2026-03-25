@@ -5,7 +5,7 @@ import com.sitionix.stsssox.domain.SiteStatus;
 import com.sitionix.stsssox.domain.SiteType;
 import com.sitionix.stsssox.it.infra.ControllerEndpoint;
 import com.sitionix.stsssox.it.infra.TestManager;
-import com.sitionix.stsssox.mongodb.entity.site.SiteEntity;
+import com.sitionix.stsssox.postgresql.entity.site.SiteEntity;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +23,7 @@ class SiteControllerIT {
     private TestManager testManager;
 
     @Test
-    @DisplayName("Should create site and persist it in MongoDB")
+    @DisplayName("Should create site and persist it in PostgreSQL")
     void givenValidRequest_whenCreateSite_thenReturnCreatedAndPersistSite() {
         //given
         final Long userId = 1L;
@@ -38,7 +38,7 @@ class SiteControllerIT {
                 .assertDefault();
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(1)
                 .singleElement()
@@ -71,7 +71,7 @@ class SiteControllerIT {
                 }));
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(1)
                 .singleElement()
@@ -97,7 +97,7 @@ class SiteControllerIT {
                         .mutateRequest(request -> request.setName("   My site name   ")));
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(1)
                 .singleElement()
@@ -123,7 +123,7 @@ class SiteControllerIT {
                 .assertDefault();
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(2)
                 .andExpected(entity -> Objects.equals(entity.getUserId(), userId))
@@ -131,7 +131,7 @@ class SiteControllerIT {
                 .andExpected(entity -> Objects.equals(entity.getStatus(), SiteStatus.DRAFT))
                 .allMatch();
 
-        final List<SiteEntity> entities = this.testManager.mongo().get(SiteEntity.class).getAll();
+        final List<SiteEntity> entities = this.testManager.postgresql().get(SiteEntity.class).getAll();
         assertThat(entities)
                 .extracting(SiteEntity::getSiteId)
                 .doesNotHaveDuplicates();
@@ -148,7 +148,7 @@ class SiteControllerIT {
                 .assertDefault();
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(0);
     }
@@ -164,7 +164,7 @@ class SiteControllerIT {
                 .assertDefault();
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(0);
     }
@@ -180,7 +180,7 @@ class SiteControllerIT {
                         .mutateRequest(request -> request.setName("   ")));
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(0);
     }
@@ -196,7 +196,7 @@ class SiteControllerIT {
                         .mutateRequest(request -> request.setName("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")));
 
         //then
-        this.testManager.mongo()
+        this.testManager.postgresql()
                 .get(SiteEntity.class)
                 .hasSize(0);
     }
