@@ -17,10 +17,6 @@ CREATE TABLE IF NOT EXISTS forge_outbox_events (
     lock_until        TIMESTAMPTZ,
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    headers           JSONB        NOT NULL DEFAULT '{}'::jsonb,
-    metadata          JSONB        NOT NULL DEFAULT '{}'::jsonb,
-    initiator_type    VARCHAR(255),
-    initiator_id      VARCHAR(255),
     CONSTRAINT fk_forge_outbox_events_aggregate_type_id
         FOREIGN KEY (aggregate_type_id) REFERENCES forge_outbox_aggregate_types (id),
     CONSTRAINT fk_forge_outbox_events_status_id
