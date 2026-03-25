@@ -180,6 +180,16 @@
 
     <repositories>
         <repository>
+            <id>github-forge-common</id>
+            <url>https://maven.pkg.github.com/sitionix/forge-common</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>github-forge-it</id>
             <url>https://maven.pkg.github.com/sitionix/forge-it</url>
             <releases>
@@ -202,16 +212,6 @@
         <repository>
             <id>github-forge-security</id>
             <url>https://maven.pkg.github.com/sitionix/forge-security</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>github-forge-common</id>
-            <url>https://maven.pkg.github.com/sitionix/forge-common</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

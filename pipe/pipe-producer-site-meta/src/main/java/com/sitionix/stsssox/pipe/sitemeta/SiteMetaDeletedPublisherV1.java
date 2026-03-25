@@ -19,6 +19,11 @@ public class SiteMetaDeletedPublisherV1 implements ForgeOutboxEventPublisher<Sit
     private final SiteMetaEventMapper mapper;
 
     @Override
+    public Class<SiteDeletedPayload> payloadClass() {
+        return SiteDeletedPayload.class;
+    }
+
+    @Override
     public void publish(final Event<SiteDeletedPayload> event) {
         log.info("Publish site meta event");
         final SiteMetaEnvelope envelope = this.mapper.asEnvelope(event);

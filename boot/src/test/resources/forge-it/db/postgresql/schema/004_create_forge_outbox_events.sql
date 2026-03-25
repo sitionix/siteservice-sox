@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS forge_outbox_events (
     id                BIGSERIAL PRIMARY KEY,
     event_type        VARCHAR(255) NOT NULL,
     payload           TEXT         NOT NULL,
-    idempotency_id    UUID         NOT NULL,
     trace_id          VARCHAR(255),
     aggregate_type_id BIGINT,
     aggregate_id      BIGINT,

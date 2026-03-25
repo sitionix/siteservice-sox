@@ -47,7 +47,6 @@ class SiteOutboxIT {
         assertThat(event.getEventType()).isEqualTo(SiteMetaEventType.SITE_CREATED.getValue());
         assertThat(event.getStatusId()).isEqualTo(1L);
         assertThat(event.getRetryCount()).isZero();
-        assertThat(event.getIdempotencyId()).isNotNull();
         assertThat(event.getCreatedAt()).isNotNull();
         assertThat(event.getUpdatedAt()).isNotNull();
         assertThat(event.getPayload()).contains("\"siteId\":\"" + site.getSiteId() + "\"");
