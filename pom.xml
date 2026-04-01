@@ -51,6 +51,7 @@
         <api.version>1.44</api.version>
         <forgeit.version>0.0.37</forgeit.version>
         <forge.security.version>0.0.4</forge.security.version>
+        <forge.common.version>0.0.8</forge.common.version>
     </properties>
 
     <dependencyManagement>
@@ -74,7 +75,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>mongodb</artifactId>
+                <artifactId>postgresql</artifactId>
             </dependency>
             <!-- DEPENDENCY -->
             <dependency>
@@ -178,6 +179,16 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>github-forge-common</id>
+            <url>https://maven.pkg.github.com/sitionix/forge-common</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>github-forge-it</id>
             <url>https://maven.pkg.github.com/sitionix/forge-it</url>

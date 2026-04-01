@@ -2,32 +2,28 @@ package com.sitionix.stsssox.pipe.sitemeta;
 
 import com.app_afesox.stsssox.events.sitemeta.SiteMetaEnvelope;
 import com.app_afesox.stsssox.events.sitemeta.kafka.SitemetaV1Producer;
-import com.sitionix.stsssox.domain.event.Event;
-import com.sitionix.stsssox.domain.event.SiteMetaEventPublisher;
-import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
+import com.sitionix.forge.outbox.core.model.Event;
+import com.sitionix.forge.outbox.core.port.ForgeOutboxEventPublisher;
+import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
 import com.sitionix.stsssox.pipe.sitemeta.mapper.SiteMetaEventMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import static java.util.Objects.isNull;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SiteMetaPublisherV1 implements SiteMetaEventPublisher {
+public class SiteMetaPublisherV1 implements ForgeOutboxEventPublisher<SiteCreatedPayload> {
 
     private final SitemetaV1Producer producer;
     private final SiteMetaEventMapper mapper;
 
     @Override
-    public void publish(final Event<SiteMetaPayload> event) {
-        log.info("Publishing site meta projection event: {}", event);
-        if (isNull(event)) {
-            return;
-        }
-
+    public void publish(final Event<SiteCreatedPayload> event) {
+        log.info("Publish site meta event");
         final SiteMetaEnvelope envelope = this.mapper.asEnvelope(event);
-        this.producer.send(event.getId(), envelope);
+        final String key = event.getPayload().site().siteId().toString();
+        this.producer.send(key, envelope);
+        log.info("Site meta event published type={} idempotencyId={}", event.getEventType(), event.getIdempotencyId());
     }
 }

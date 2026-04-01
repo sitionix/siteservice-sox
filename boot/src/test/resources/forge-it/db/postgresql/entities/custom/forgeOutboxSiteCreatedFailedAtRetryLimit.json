@@ -1,0 +1,14 @@
+{
+  "id": 1007,
+  "eventType": "SITE_CREATED",
+  "payload": "{\"site\":{\"siteId\":\"55db7314-63a5-49b5-bdb6-6a6cc59e61b9\",\"userId\":17,\"name\":\"Site A\",\"status\":\"DRAFT\",\"createdAt\":\"2026-03-04T10:20:00Z\",\"updatedAt\":\"2026-03-04T10:20:00Z\",\"type\":\"PORTFOLIO\",\"description\":\"Description A\"}}",
+  "idempotencyId": "77777777-7777-7777-7777-777777777777",
+  "aggregateTypeId": 1,
+  "aggregateId": 17,
+  "statusId": 4,
+  "retryCount": 4,
+  "nextRetryAt": "2026-03-04T10:19:30Z",
+  "lastError": "previous error",
+  "createdAt": "2026-03-04T10:20:00Z",
+  "updatedAt": "2026-03-04T10:20:00Z"
+}

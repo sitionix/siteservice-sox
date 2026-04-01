@@ -5,14 +5,12 @@ import com.sitionix.stsssox.domain.Site;
 import com.sitionix.stsssox.domain.SiteStatus;
 import com.sitionix.stsssox.domain.SiteTemplate;
 import com.sitionix.stsssox.domain.SiteType;
-import com.sitionix.stsssox.domain.event.Event;
-import com.sitionix.stsssox.domain.event.SiteMetaEventPublisher;
 import com.sitionix.stsssox.domain.event.payload.SiteCreatedPayload;
-import com.sitionix.stsssox.domain.event.payload.SiteMetaPayload;
 import com.sitionix.stsssox.domain.exception.AuthenticationRequiredException;
 import com.sitionix.stsssox.domain.exception.SiteValidationException;
 import com.sitionix.stsssox.domain.model.CreateSiteCommand;
 import com.sitionix.stsssox.domain.repository.SiteRepository;
+import com.sitionix.forge.outbox.core.port.ForgeOutbox;
 import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,16 +41,16 @@ class CreateSiteImplTest {
     private ForgeUserClient forgeUserClient;
 
     @Mock
-    private SiteMetaEventPublisher siteMetaEventPublisher;
+    private ForgeOutbox forgeOutbox;
 
     @BeforeEach
     void setUp() {
-        this.createSite = new CreateSiteImpl(this.siteRepository, this.forgeUserClient, this.siteMetaEventPublisher);
+        this.createSite = new CreateSiteImpl(this.siteRepository, this.forgeUserClient, this.forgeOutbox);
     }
 
     @AfterEach
     void tearDown() {
-        verifyNoMoreInteractions(this.siteRepository, this.forgeUserClient, this.siteMetaEventPublisher);
+        verifyNoMoreInteractions(this.siteRepository, this.forgeUserClient, this.forgeOutbox);
     }
 
     @Test
@@ -73,15 +71,9 @@ class CreateSiteImplTest {
         verify(this.forgeUserClient).getUserId();
         verify(this.siteRepository).save(siteCaptor.capture());
         final Site savedSite = siteCaptor.getValue();
-        final ArgumentCaptor<Event<SiteMetaPayload>> eventCaptor = ArgumentCaptor.forClass(Event.class);
-        verify(this.siteMetaEventPublisher).publish(eventCaptor.capture());
-        final Event<SiteMetaPayload> publishedEvent = eventCaptor.getValue();
-        assertThat(publishedEvent.getEventType()).isEqualTo("SITE_CREATED");
-        assertThat(publishedEvent.getId()).isEqualTo(savedSite.siteId().toString());
-        assertThat(publishedEvent.getIdempotencyId()).isNotNull();
-        assertThat(publishedEvent.getCreatedAt()).isBetween(before, after);
-        assertThat(publishedEvent.getPayload()).isInstanceOf(SiteCreatedPayload.class);
-        final SiteCreatedPayload payload = (SiteCreatedPayload) publishedEvent.getPayload();
+        final ArgumentCaptor<SiteCreatedPayload> payloadCaptor = ArgumentCaptor.forClass(SiteCreatedPayload.class);
+        verify(this.forgeOutbox).send(payloadCaptor.capture());
+        final SiteCreatedPayload payload = payloadCaptor.getValue();
         assertThat(payload.site()).isEqualTo(savedSite);
         assertThat(actual).isEqualTo(savedSite);
         assertThat(savedSite.userId()).isEqualTo(userId);
@@ -107,7 +99,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(AuthenticationRequiredException.class)
                 .hasMessage("Authentication required");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
+        verifyNoInteractions(this.siteRepository, this.forgeOutbox);
     }
 
     @Test
@@ -124,7 +116,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(SiteValidationException.class)
                 .hasMessage("Site name is required");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
+        verifyNoInteractions(this.siteRepository, this.forgeOutbox);
     }
 
     @Test
@@ -141,7 +133,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(SiteValidationException.class)
                 .hasMessage("Site name is required");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
+        verifyNoInteractions(this.siteRepository, this.forgeOutbox);
     }
 
     @Test
@@ -158,7 +150,7 @@ class CreateSiteImplTest {
                 .isInstanceOf(SiteValidationException.class)
                 .hasMessage("Site name must be between 1 and 60 characters");
         verify(this.forgeUserClient).getUserId();
-        verifyNoInteractions(this.siteRepository, this.siteMetaEventPublisher);
+        verifyNoInteractions(this.siteRepository, this.forgeOutbox);
     }
 
     private CreateSiteCommand getCreateSiteCommand(final String name) {

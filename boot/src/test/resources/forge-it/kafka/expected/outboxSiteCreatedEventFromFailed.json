@@ -1,0 +1,10 @@
+{
+  "siteId": "55db7314-63a5-49b5-bdb6-6a6cc59e61b9",
+  "userId": 17,
+  "name": "Site A",
+  "status": "DRAFT",
+  "type": "PORTFOLIO",
+  "description": "Description A",
+  "createdAt": "2026-03-04T10:20:00Z",
+  "updatedAt": "2026-03-04T10:20:00Z"
+}
