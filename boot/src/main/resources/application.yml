@@ -7,23 +7,43 @@ spring:
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/SITES_SOX}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/sites_sox}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres-pwd}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
 forge:
   outbox:
     domain-store: POSTGRES
   security:
     service-id: sitionixSite
     dev:
-      jwt-secret: ${FORGE_SECURITY_DEV_JWT_SECRET:dev-internal-auth-secret}
-      issuer: ${FORGE_SECURITY_DEV_ISSUER:sitionix-internal}
-      ttl-seconds: ${FORGE_SECURITY_DEV_TTL_SECONDS:300}
+      jwt-secret: ${FORGE_SECURITY_DEV_JWT_SECRET}
+      issuer: sitionix-internal
+      ttl-seconds: 300
     policies:
       sitionixBff:
         allow:
           - "*"
+    server:
+      excludes:
+        - "/actuator/health"
+        - "/actuator/health/readiness"
+        - "/actuator/health/liveness"
