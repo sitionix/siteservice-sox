@@ -49,7 +49,7 @@
         <spring.version>3.3.4</spring.version>
         <testcontainers.version>1.20.1</testcontainers.version>
         <api.version>1.44</api.version>
-        <forgeit.version>0.0.37</forgeit.version>
+        <forgeit.version>0.0.39</forgeit.version>
         <forge.security.version>0.0.4</forge.security.version>
         <forge.common.version>0.0.8</forge.common.version>
     </properties>
