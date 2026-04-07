@@ -1,0 +1,11 @@
+database:
+  name: sites_sox
+  environments:
+    dev:
+      url: jdbc:postgresql://127.0.0.1:15433/sites_sox
+      username: stsssox_app
+      password_secret_name: SITES_SOX_DB_PASSWORD
+      tunnel:
+        local_port: 15433
+        remote_host: 127.0.0.1
+        remote_port: 5432

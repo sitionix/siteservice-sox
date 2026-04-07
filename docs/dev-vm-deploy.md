@@ -1,0 +1,96 @@
+# Dev VM Deploy
+
+## Model
+- Push to `develop` triggers `Dev Deploy On Push`.
+- A pull request comment can trigger the lightweight `Deploy Comment Router`, which dispatches one real command workflow against the PR head branch:
+  ```text
+  /deploy service --name siteservice-sox --env dev
+  /deploy db --name sites_sox --env dev
+  ```
+- Real command workflows are split:
+  - `Service Deploy On Command`
+  - `DB Migrate On Command`
+- GitHub Actions builds and publishes the runtime image, uploads a release bundle to the VM, and performs the rollout over SSH.
+- DB migration is explicit and separate from service rollout. The deploy workflow does not run Flyway implicitly.
+- The VM is runtime-only. The workflows do not use `git pull` and do not require manual VM edits.
+
+## GitHub Environment
+Use GitHub Environment `dev`.
+
+### Secrets
+- `DEPLOY_VM_HOST`
+- `DEPLOY_VM_USER`
+- `DEPLOY_VM_SSH_PRIVATE_KEY`
+- `GHCR_PULL_USERNAME`
+- `GHCR_PULL_TOKEN`
+- `SITES_SOX_DB_PASSWORD`
+
+### Vars
+- `DEPLOY_VM_PORT`
+
+### Repository Vars
+- `MAVEN_REPOSITORY_USERNAME`
+
+### Repository Secrets
+- `MAVEN_REPOSITORY_TOKEN`
+
+## VM Runtime Contract
+- Docker network: `sitionix-dev`
+- Container name: `siteservice-sox`
+- Docker network alias: `siteservice-sox`
+- Host-only bind: `127.0.0.1:9080 -> 9080`
+- Internal base URL for downstream services: `http://siteservice-sox:9080/stsssox`
+- VM-local readiness URL: `http://127.0.0.1:9080/stsssox/actuator/health/readiness`
+- VM-local health URL: `http://127.0.0.1:9080/stsssox/actuator/health`
+
+## Files Materialized on the VM
+- Runtime root: `/opt/sitionix/runtime/siteservice-sox`
+- Service env file:
+  - `/opt/sitionix/runtime/siteservice-sox/shared/siteservice-sox.dev.env`
+- Shared internal auth env file, owned by infra:
+  - `/opt/sitionix/runtime/shared/dev-internal-auth.env`
+- Release backups:
+  - `/opt/sitionix/backups/siteservice-sox/releases/<release-id>/release-manifest.json`
+
+## Runtime Environment Values
+The deploy workflow materializes these runtime values for the container:
+- `SPRING_PROFILES_ACTIVE=dev`
+- `ENVIRONMENT=dev`
+- `SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/sites_sox`
+- `SPRING_DATASOURCE_USERNAME=stsssox_app`
+- `SPRING_DATASOURCE_PASSWORD` from `SITES_SOX_DB_PASSWORD`
+- `SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092`
+- `FORGE_SECURITY_DEV_JWT_SECRET` from the shared infra-owned file
+
+## DB Migration Contract
+- Source of truth for migration target resolution:
+  - `db-migration/db-model.yaml`
+- Canonical migration command:
+  - `/deploy db --name sites_sox --env dev`
+- Canonical Flyway SQL location:
+  - `db-migration`
+- The `boot` module now runs with `spring.jpa.hibernate.ddl-auto=validate`, so schema ownership moves to Flyway instead of Hibernate auto-update.
+- The migration workflow opens an SSH tunnel to the VM and runs:
+  - `flyway migrate`
+  - `flyway validate`
+  - `flyway info`
+
+## Verification
+- Remote rollout waits for Spring actuator health:
+  - `GET /stsssox/actuator/health/readiness`
+  - `GET /stsssox/actuator/health`
+- Workflow smoke verification opens an SSH tunnel to `127.0.0.1:9080` on the VM and checks:
+  - readiness endpoint returns `UP`
+  - health endpoint returns `UP`
+
+## Shared Maven Contract
+- The canonical Maven settings template is owned by `sitionix-infra`:
+  - `contracts/shared/maven/settings.xml.template`
+- This workflow checks out that shared template at runtime and injects:
+  - repository variable `MAVEN_REPOSITORY_USERNAME`
+  - repository secret `MAVEN_REPOSITORY_TOKEN`
+
+## What This Workflow Does Not Do
+- It does not deploy BFF or SPA.
+- It does not expose site service publicly on `0.0.0.0`.
+- It does not mutate VM state outside the runtime directories under `/opt/sitionix`.

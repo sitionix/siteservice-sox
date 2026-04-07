@@ -1,0 +1,49 @@
+name: Dev Deploy On Push
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - ".github/workflows/dev-deploy-on-push.yml"
+      - ".github/actions/service-deploy-run/**"
+      - ".github/actions/materialize-maven-settings/**"
+      - "deploy/service/**"
+      - "boot/**"
+      - "api-rest/**"
+      - "application/**"
+      - "domain/**"
+      - "infrastructure/**"
+      - "pipe/**"
+      - "Dockerfile"
+      - "pom.xml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DEPLOY_VM_PORT: ${{ vars.DEPLOY_VM_PORT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Execute dev deployment
+        uses: ./.github/actions/service-deploy-run
+        with:
+          github_environment: dev
+        env:
+          DEPLOY_VM_HOST: ${{ secrets.DEPLOY_VM_HOST }}
+          DEPLOY_VM_USER: ${{ secrets.DEPLOY_VM_USER }}
+          DEPLOY_VM_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_VM_SSH_PRIVATE_KEY }}
+          GHCR_PULL_USERNAME: ${{ secrets.GHCR_PULL_USERNAME }}
+          GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+          MAVEN_REPOSITORY_USERNAME: ${{ vars.MAVEN_REPOSITORY_USERNAME }}
+          MAVEN_REPOSITORY_TOKEN: ${{ secrets.MAVEN_REPOSITORY_TOKEN }}
+          SITES_SOX_DB_PASSWORD: ${{ secrets.SITES_SOX_DB_PASSWORD }}
