@@ -1,5 +1,5 @@
 name: Service Deploy Run
-description: Build, publish, deploy, and verify the site service on the dev VM.
+description: Build, publish, deploy, and verify the site service on the target VM environment.
 
 inputs:
   github_environment:
@@ -104,12 +104,12 @@ runs:
         SITIONIX_BIND_ADDRESS=127.0.0.1
         SITIONIX_HOST_PORT=9080
         SITIONIX_CONTAINER_PORT=9080
-        SITIONIX_ACTIVE_PROFILE=dev
-        SITIONIX_DOCKER_NETWORK=sitionix-dev
+        SITIONIX_ACTIVE_PROFILE=${GITHUB_ENVIRONMENT_NAME}
+        SITIONIX_DOCKER_NETWORK=sitionix-${GITHUB_ENVIRONMENT_NAME}
         SITIONIX_RUNTIME_ROOT=/opt/sitionix/runtime/siteservice-sox
         SITIONIX_BACKUP_ROOT=/opt/sitionix/backups/siteservice-sox
-        SITIONIX_SHARED_SECRET_ENV_PATH=/opt/sitionix/runtime/shared/dev-internal-auth.env
-        SITIONIX_SERVICE_ENV_PATH=/opt/sitionix/runtime/siteservice-sox/shared/siteservice-sox.dev.env
+        SITIONIX_SHARED_SECRET_ENV_PATH=/opt/sitionix/runtime/shared/${GITHUB_ENVIRONMENT_NAME}-internal-auth.env
+        SITIONIX_SERVICE_ENV_PATH=/opt/sitionix/runtime/siteservice-sox/shared/siteservice-sox.${GITHUB_ENVIRONMENT_NAME}.env
         SITIONIX_LOCAL_READINESS_URL=http://127.0.0.1:9080/stsssox/actuator/health/readiness
         SITIONIX_LOCAL_HEALTH_URL=http://127.0.0.1:9080/stsssox/actuator/health
         SITIONIX_DB_URL=jdbc:postgresql://postgres:5432/sites_sox
@@ -123,7 +123,7 @@ runs:
           "imageRef": "${IMAGE_REF}",
           "githubSha": "${GITHUB_SHA}",
           "githubEnvironment": "${GITHUB_ENVIRONMENT_NAME}",
-          "dockerNetwork": "sitionix-dev",
+          "dockerNetwork": "sitionix-${GITHUB_ENVIRONMENT_NAME}",
           "containerName": "siteservice-sox",
           "privateHostPort": "127.0.0.1:9080",
           "privateBaseUrl": "http://siteservice-sox:9080/stsssox"
